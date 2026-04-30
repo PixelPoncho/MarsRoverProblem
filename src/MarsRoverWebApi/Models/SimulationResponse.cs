@@ -51,7 +51,7 @@ namespace MarsRoverWebApi.Models
         /// <summary>
         /// Final direction heading
         /// </summary>
-        public string FinalDirection { get; set; }
+        public string FinalDirection { get; set; } = string.Empty;
 
         /// <summary>
         /// Complete path taken by rover (array of coordinates)
@@ -63,6 +63,6 @@ namespace MarsRoverWebApi.Models
         /// <summary>
         /// Commands that were executed
         /// </summary>
-        public string Commands { get; set; }
+        public string Commands { get; set; } = string.Empty;
     }
 }

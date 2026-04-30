@@ -29,7 +29,7 @@ builder.Services.AddSingleton<IRoverSimulationService, RoverSimulationService>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new()
     {
         Title = "Mars Rover API",
         Version = "v1",

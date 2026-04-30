@@ -10,8 +10,6 @@
   <ItemGroup>
     <!-- HTTP client for calling the Web API -->
     <PackageReference Include="HttpClientFactory" Version="10.0.0" />
-    <!-- JSON serialization -->
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
