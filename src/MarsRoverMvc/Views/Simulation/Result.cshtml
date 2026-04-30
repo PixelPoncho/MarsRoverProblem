@@ -1,0 +1,230 @@
+@model SimulationResultViewModel
+
+@{
+    ViewData["Title"] = "Simulation Results";
+}
+
+<div class="page-header">
+    <h1 class="page-title">✓ Simulation Complete</h1>
+    <p class="page-description">Plateau: @Model.PlateauMaxX x @Model.PlateauMaxY | Rovers: @Model.Results.Count | Executed: @Model.ExecutedAt.ToString("yyyy-MM-dd HH:mm:ss")</p>
+</div>
+
+<!-- Plateau Visualization -->
+<div class="card">
+    <h2 class="card-title">3. Plateau Visualization</h2>
+    
+    <div id="plateauContainer" style="display: flex; justify-content: center; margin: 30px 0;">
+        <canvas id="plateauCanvas" width="500" height="500" style="border: 2px solid #ddd; background: #f0f0f0; border-radius: 8px;"></canvas>
+    </div>
+    
+    <button type="button" class="btn btn-secondary" onclick="captureScreenshot('plateauContainer')">
+        📷 Capture Screenshot
+    </button>
+    <input type="hidden" id="simulationId" value="@Model.SimulationId">
+</div>
+
+<!-- Results Table -->
+<div class="card">
+    <h2 class="card-title">4. Results</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Rover</th>
+                <th>Final Position (X Y D)</th>
+                <th>Commands</th>
+                <th>Path Length</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model.Results)
+            {
+                <tr>
+                    <td><strong>Rover @result.RoverId</strong></td>
+                    <td>
+                        <strong>@result.FinalX @result.FinalY @result.FinalDirection</strong>
+                    </td>
+                    <td><code>@result.Commands</code></td>
+                    <td>@result.Path.Count steps</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Actions -->
+<div style="display: flex; gap: 10px; margin-top: 30px;">
+    <a href="/Simulation/Index" class="btn btn-primary">
+        <span>⚙️</span>
+        <span>Run Another Simulation</span>
+    </a>
+    <a href="/History/Index" class="btn btn-secondary">
+        <span>📚</span>
+        <span>View History</span>
+    </a>
+    <a href="/" class="btn btn-secondary">
+        <span>🏠</span>
+        <span>Home</span>
+    </a>
+</div>
+
+<script>
+    // Data passed to the visualization script
+    const plateauData = {
+        maxX: @Model.PlateauMaxX,
+        maxY: @Model.PlateauMaxY,
+        rovers: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Results))
+    };
+
+    // Draw the plateau when the page loads
+    window.addEventListener('load', function() {
+        drawPlateau();
+    });
+
+    function drawPlateau() {
+        const canvas = document.getElementById('plateauCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Canvas dimensions
+        const padding = 40;
+        const usableWidth = canvas.width - (padding * 2);
+        const usableHeight = canvas.height - (padding * 2);
+        const cellWidth = usableWidth / plateauData.maxX;
+        const cellHeight = usableHeight / plateauData.maxY;
+        
+        // Clear canvas
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw grid
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        
+        // Vertical lines
+        for (let x = 0; x <= plateauData.maxX; x++) {
+            const xPos = padding + (x * cellWidth);
+            ctx.beginPath();
+            ctx.moveTo(xPos, padding);
+            ctx.lineTo(xPos, canvas.height - padding);
+            ctx.stroke();
+        }
+        
+        // Horizontal lines
+        for (let y = 0; y <= plateauData.maxY; y++) {
+            const yPos = canvas.height - padding - (y * cellHeight);
+            ctx.beginPath();
+            ctx.moveTo(padding, yPos);
+            ctx.lineTo(canvas.width - padding, yPos);
+            ctx.stroke();
+        }
+        
+        // Draw coordinate labels
+        ctx.fillStyle = '#999';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        
+        for (let x = 0; x <= plateauData.maxX; x++) {
+            const xPos = padding + (x * cellWidth);
+            ctx.fillText(x, xPos, 20);
+        }
+        
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        
+        for (let y = 0; y <= plateauData.maxY; y++) {
+            const yPos = canvas.height - padding - (y * cellHeight);
+            ctx.fillText(y, padding - 10, yPos);
+        }
+        
+        // Draw rovers and their paths
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'];
+        
+        plateauData.rovers.forEach((rover, index) => {
+            const color = colors[index % colors.length];
+            
+            // Draw path
+            if (rover.path && rover.path.length > 0) {
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = 0.5;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                rover.path.forEach((pos, i) => {
+                    const coords = pos.split(' ');
+                    const x = parseInt(coords[0]);
+                    const y = parseInt(coords[1]);
+                    
+                    const xPos = padding + (x * cellWidth) + (cellWidth / 2);
+                    const yPos = canvas.height - padding - (y * cellHeight) - (cellHeight / 2);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(xPos, yPos);
+                    } else {
+                        ctx.lineTo(xPos, yPos);
+                    }
+                });
+                
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+            
+            // Draw start position (green)
+            if (rover.path && rover.path.length > 0) {
+                const startCoords = rover.path[0].split(' ');
+                const startX = parseInt(startCoords[0]);
+                const startY = parseInt(startCoords[1]);
+                
+                const xPos = padding + (startX * cellWidth) + (cellWidth / 2);
+                const yPos = canvas.height - padding - (startY * cellHeight) - (cellHeight / 2);
+                
+                ctx.fillStyle = '#4CAF50';
+                ctx.beginPath();
+                ctx.arc(xPos, yPos, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('S', xPos, yPos);
+            }
+            
+            // Draw final position (red)
+            const finalXPos = padding + (rover.finalX * cellWidth) + (cellWidth / 2);
+            const finalYPos = canvas.height - padding - (rover.finalY * cellHeight) - (cellHeight / 2);
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(finalXPos, finalYPos, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText((index + 1), finalXPos, finalYPos);
+        });
+        
+        // Draw legend
+        const legendX = canvas.width - 140;
+        const legendY = 20;
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillRect(legendX - 10, legendY - 10, 140, 80);
+        ctx.strokeStyle = '#ddd';
+        ctx.strokeRect(legendX - 10, legendY - 10, 140, 80);
+        
+        ctx.fillStyle = '#4CAF50';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('● Start Position', legendX, legendY);
+        
+        ctx.fillStyle = '#FF6B6B';
+        ctx.fillText('● Final Position', legendX, legendY + 20);
+        
+        ctx.fillStyle = '#ddd';
+        ctx.fillText('--- Path Taken', legendX, legendY + 40);
+    }
+</script>

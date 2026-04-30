@@ -1,0 +1,82 @@
+@model HistoryViewModel
+
+@{
+    ViewData["Title"] = "Simulation History";
+}
+
+<div class="page-header">
+    <h1 class="page-title">📚 Simulation History</h1>
+    <p class="page-description">Review all your past simulations</p>
+</div>
+
+@if (Model.Simulations == null || Model.Simulations.Count == 0)
+{
+    <div class="card">
+        <div style="text-align: center; padding: 40px;">
+            <p style="font-size: 16px; color: #666; margin-bottom: 20px;">No simulations yet. Let's create one!</p>
+            <a href="/Simulation/Index" class="btn btn-primary">
+                <span>⚙️</span>
+                <span>Start New Simulation</span>
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <h2 class="card-title">Recent Simulations</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plateau Size</th>
+                    <th>Rovers</th>
+                    <th>Results</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var simulation in Model.Simulations)
+                {
+                    <tr>
+                        <td>
+                            <code style="font-size: 11px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">
+                                @simulation.SimulationId.Substring(0, 8)...
+                            </code>
+                        </td>
+                        <td>@simulation.PlateauSize</td>
+                        <td>@simulation.RoverCount</td>
+                        <td>
+                            @foreach (var result in simulation.Results)
+                            {
+                                <div style="font-size: 12px; margin-bottom: 4px;">
+                                    <strong>Rover @result.RoverId:</strong> @result.FinalX @result.FinalY @result.FinalDirection
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <small>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="/" class="btn btn-secondary">← Back to Home</a>
+</div>
+
+<script>
+    function viewDetails(simulationId) {
+        alert('Simulation ID: ' + simulationId + '\n\nDetailed view coming soon!');
+    }
+</script>
