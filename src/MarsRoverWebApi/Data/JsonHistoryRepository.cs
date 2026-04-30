@@ -3,11 +3,9 @@ using System.Text.Json;
 
 namespace MarsRoverWebApi.Data
 {
-    /// <summary>
     /// JSON-based implementation of history persistence
     /// Stores simulation records and screenshots in JSON files
     /// This is a temporary solution until a database is implemented
-    /// </summary>
     public class JsonHistoryRepository : IHistoryRepository
     {
         // Directory where all history files are stored
@@ -29,11 +27,9 @@ namespace MarsRoverWebApi.Data
             Directory.CreateDirectory(_screenshotsDirectory);
         }
 
-        /// <summary>
         /// Saves a simulation result to the JSON history file
         /// If file doesn't exist, creates it with a new array
         /// If file exists, appends to the existing array
-        /// </summary>
         public async Task SaveSimulationAsync(object simulation)
         {
             try
@@ -70,9 +66,7 @@ namespace MarsRoverWebApi.Data
             }
         }
 
-        /// <summary>
         /// Retrieves all historical simulations from the JSON file
-        /// </summary>
         public async Task<List<object>> GetAllSimulationsAsync()
         {
             try
@@ -106,10 +100,8 @@ namespace MarsRoverWebApi.Data
             }
         }
 
-        /// <summary>
         /// Saves a screenshot (as base64) with its associated simulation ID
         /// Screenshots are stored as separate files for easy management
-        /// </summary>
         public async Task SaveScreenshotAsync(string simulationId, string screenshotBase64)
         {
             try

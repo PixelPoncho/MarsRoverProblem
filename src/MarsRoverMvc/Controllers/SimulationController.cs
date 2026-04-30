@@ -4,11 +4,9 @@ using MarsRoverMvc.Services;
 
 namespace MarsRoverMvc.Controllers
 {
-    /// <summary>
     /// Controller for the main simulation page
     /// Handles user input for plateau and rover configuration
     /// Communicates with the Web API for simulation execution
-    /// </summary>
     public class SimulationController : Controller
     {
         private readonly IRoverApiService _apiService;
@@ -20,10 +18,8 @@ namespace MarsRoverMvc.Controllers
             _logger = logger;
         }
 
-        /// <summary>
         /// GET /Simulation/Index
         /// Displays the simulation form where users can input plateau and rover data
-        /// </summary>
         public IActionResult Index()
         {
             // Create a new simulation view model with default values
@@ -41,11 +37,9 @@ namespace MarsRoverMvc.Controllers
             return View(model);
         }
 
-        /// <summary>
         /// POST /Simulation/Run
         /// Processes the simulation form submission
         /// Calls the Web API to run the simulation and displays results
-        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Run(SimulationViewModel model)
         {

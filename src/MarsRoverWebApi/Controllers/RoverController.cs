@@ -4,10 +4,8 @@ using MarsRoverWebApi.Services;
 
 namespace MarsRoverWebApi.Controllers
 {
-    /// <summary>
     /// REST API controller for rover simulation operations
     /// Provides endpoints for running simulations and managing history
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class RoverController : ControllerBase
@@ -24,10 +22,8 @@ namespace MarsRoverWebApi.Controllers
             _historyRepository = historyRepository;
         }
 
-        /// <summary>
         /// POST /api/rover/simulate
         /// Executes a rover simulation with the provided plateau and rover data
-        /// </summary>
         /// <param name="request">The simulation request containing plateau dimensions and rover details</param>
         /// <returns>The simulation response with final positions and paths</returns>
         [HttpPost("simulate")]
@@ -65,10 +61,8 @@ namespace MarsRoverWebApi.Controllers
             }
         }
 
-        /// <summary>
         /// GET /api/rover/history
         /// Retrieves all historical simulations
-        /// </summary>
         /// <returns>List of all past simulations</returns>
         [HttpGet("history")]
         public async Task<ActionResult<IEnumerable<object>>> GetHistory()
@@ -85,10 +79,8 @@ namespace MarsRoverWebApi.Controllers
             }
         }
 
-        /// <summary>
         /// POST /api/rover/save-screenshot
         /// Saves a screenshot of the plateau visualization
-        /// </summary>
         /// <param name="simulationId">The ID of the simulation</param>
         /// <param name="screenshotData">The screenshot data in base64 format</param>
         /// <returns>Success confirmation</returns>
@@ -115,15 +107,11 @@ namespace MarsRoverWebApi.Controllers
         }
     }
 
-    /// <summary>
     /// Model for screenshot submission
-    /// </summary>
     public class ScreenshotData
     {
-        /// <summary>
         /// The image data encoded in base64 format
         /// This allows binary image data to be transmitted as JSON
-        /// </summary>
         public string? ImageBase64 { get; set; }
     }
 }

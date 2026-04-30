@@ -4,10 +4,8 @@ using MarsRoverMvc.Services;
 
 namespace MarsRoverMvc.Controllers
 {
-    /// <summary>
     /// Controller for the simulation history page
     /// Displays all past simulations and their results
-    /// </summary>
     public class HistoryController : Controller
     {
         private readonly IRoverApiService _apiService;
@@ -19,10 +17,8 @@ namespace MarsRoverMvc.Controllers
             _logger = logger;
         }
 
-        /// <summary>
         /// GET /History/Index
         /// Displays all historical simulations
-        /// </summary>
         public async Task<IActionResult> Index()
         {
             try

@@ -2,10 +2,8 @@ using MarsRoverWebApi.Models;
 
 namespace MarsRoverWebApi.Services
 {
-    /// <summary>
     /// Service that implements the rover simulation logic
     /// This is the core business logic for the Mars Rover problem
-    /// </summary>
     public class RoverSimulationService : IRoverSimulationService
     {
         public SimulationResponse Simulate(SimulationRequest request)
@@ -55,10 +53,8 @@ namespace MarsRoverWebApi.Services
             return response;
         }
 
-        /// <summary>
         /// Executes all commands for a single rover
         /// Commands can be: L (left turn), R (right turn), M (move forward)
-        /// </summary>
         private void ExecuteRoverCommands(Rover rover, Plateau plateau)
         {
             // Process each character in the command string
@@ -83,10 +79,8 @@ namespace MarsRoverWebApi.Services
             }
         }
 
-        /// <summary>
         /// Rotates the rover 90 degrees left or right
         /// This changes the direction but not the position
-        /// </summary>
         private void RotateRover(Rover rover, bool turnRight)
         {
             // Map of direction rotations
@@ -98,10 +92,8 @@ namespace MarsRoverWebApi.Services
                 : RotateCounterClockwise(rover.CurrentPosition.Direction);
         }
 
-        /// <summary>
         /// Rotates direction 90 degrees clockwise (right)
         /// N (north) -> E (east) -> S (south) -> W (west) -> N
-        /// </summary>
         private Direction RotateClockwise(Direction current)
         {
             return current switch
@@ -114,10 +106,8 @@ namespace MarsRoverWebApi.Services
             };
         }
 
-        /// <summary>
         /// Rotates direction 90 degrees counter-clockwise (left)
         /// N (north) -> W (west) -> S (south) -> E (east) -> N
-        /// </summary>
         private Direction RotateCounterClockwise(Direction current)
         {
             return current switch
@@ -130,10 +120,8 @@ namespace MarsRoverWebApi.Services
             };
         }
 
-        /// <summary>
         /// Moves the rover forward one grid point in its current direction
         /// Only moves if the new position is within plateau bounds
-        /// </summary>
         private void MoveRover(Rover rover, Plateau plateau)
         {
             // Calculate the new position based on current direction
