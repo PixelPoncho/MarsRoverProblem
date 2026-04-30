@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- NuGet packages required for the MVC application -->
+  <ItemGroup>
+    <!-- HTTP client for calling the Web API -->
+    <PackageReference Include="HttpClientFactory" Version="10.0.0" />
+    <!-- JSON serialization -->
+    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>
