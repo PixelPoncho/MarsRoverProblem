@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <!-- NuGet packages required for the MVC application -->
-  <ItemGroup>
-    <!-- HTTP client for calling the Web API -->
-    <PackageReference Include="HttpClientFactory" Version="10.0.0" />
-    <!-- JSON serialization -->
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
-  </ItemGroup>
+  <!-- Note: HttpClient is built into the framework, no additional packages needed -->
 
 </Project>
