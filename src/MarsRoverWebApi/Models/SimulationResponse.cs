@@ -33,7 +33,7 @@ namespace MarsRoverWebApi.Models
         public int FinalY { get; set; }
 
         /// Final direction heading
-        public string FinalDirection { get; set; }
+        public string FinalDirection { get; set; } = string.Empty;
 
         /// Complete path taken by rover (array of coordinates)
         /// Used for visualization on the plateau
@@ -41,6 +41,6 @@ namespace MarsRoverWebApi.Models
         public List<string> Path { get; set; } = new List<string>();
 
         /// Commands that were executed
-        public string Commands { get; set; }
+        public string Commands { get; set; } = string.Empty;
     }
 }
