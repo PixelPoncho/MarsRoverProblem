@@ -1,4 +1,4 @@
-@model SimulationViewModel
+@model MarsRoverMvc.Models.SimulationViewModel
 
 @{
     ViewData["Title"] = "New Simulation";
@@ -96,8 +96,9 @@
 </div>
 
 <script>
-    let roverCount = @Model.Rovers.Count;
-    
+    // !!! FIX THIS
+    let roverCount = @(Model?.Rovers?.Count ?? 0); 
+
     function addRover() {
         const container = document.getElementById('roversContainer');
         const plateauX = document.getElementById('PlateauMaxX').value;

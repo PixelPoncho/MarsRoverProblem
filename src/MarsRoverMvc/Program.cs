@@ -10,16 +10,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<IRoverApiService, RoverApiService>(client =>
 {
     // Configure the base address for API calls
-    // In development, the API runs on port 5001
-    client.BaseAddress = new Uri("https://localhost:5001");
+    // In development, the API runs on port 5002
+    client.BaseAddress = new Uri("https://localhost:5002");
     // Disable SSL verification for development (remove in production)
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+}).ConfigureHttpMessageHandlerBuilder(builder => {
+     // Also register HttpClientHandler to ignore SSL for development
 
-// Also register HttpClientHandler to ignore SSL for development
-.ConfigureHttpMessageHandlerBuilder(builder =>
-{
-    builder.PrimaryHandler = new HttpClientHandler
+     builder.PrimaryHandler = new HttpClientHandler
     {
         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
     };

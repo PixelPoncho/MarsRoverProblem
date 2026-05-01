@@ -50,19 +50,19 @@ MarsRoverProblem/
    dotnet build
    ```
 
-2. Run Web API (port 5001):
+2. Run Web API (port 502):
    ```bash
    cd src/MarsRoverWebApi
    dotnet run
    ```
 
-3. Run MVC App (port 5000):
+3. Run MVC App (port 5036):
    ```bash
    cd src/MarsRoverMvc
    dotnet run
    ```
 
-4. Open browser to `http://localhost:5000`
+4. Open browser to `http://localhost:5036`
 
 ## API Endpoints
 
