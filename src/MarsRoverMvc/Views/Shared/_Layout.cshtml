@@ -359,14 +359,19 @@
                 return;
             }
 
-            fetch(`/api/rover/save-screenshot?simulationId=${simulationId}`, {
+            fetch(`https://localhost:5002/api/rover/save-screenshot?simulationId=${simulationId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ imageBase64: base64Image })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 alert('Screenshot saved successfully!');
             })

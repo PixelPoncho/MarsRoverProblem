@@ -62,23 +62,35 @@ namespace MarsRoverMvc.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    
+                    _logger.LogInformation($"History API Response: {responseContent}");
+
+                    // Handle empty response
+                    if (string.IsNullOrEmpty(responseContent))
+                    {
+                        _logger.LogWarning("History API returned empty content");
+                        return new List<SimulationHistoryItem>();
+                    }
+
                     // Parse the JSON response
                     using var document = JsonDocument.Parse(responseContent);
                     var items = new List<SimulationHistoryItem>();
+
+                    _logger.LogInformation($"Parsed JSON, root element kind: {document.RootElement.ValueKind}");
 
                     // Each item in the response is a simulation record
                     foreach (var element in document.RootElement.EnumerateArray())
                     {
                         try
                         {
+                            _logger.LogInformation($"Processing history item: {element.GetRawText().Substring(0, Math.Min(100, element.GetRawText().Length))}...");
+
                             // Extract properties from each simulation record
                             var item = new SimulationHistoryItem
                             {
-                                SimulationId = element.GetProperty("simulationId").GetString() ?? string.Empty,
-                                PlateauSize = element.GetProperty("plateauSize").GetString() ?? string.Empty,
-                                RoverCount = element.GetProperty("roverCount").GetInt32(),
-                                ExecutedAt = DateTime.Parse(element.GetProperty("executedAt").GetString() ?? DateTime.UtcNow.ToString()),
+                                SimulationId = GetJsonString(element, "simulationId"),
+                                PlateauSize = GetJsonString(element, "plateauSize"),
+                                RoverCount = GetJsonInt(element, "roverCount"),
+                                ExecutedAt = GetJsonDateTime(element, "executedAt"),
                             };
 
                             // Parse rover results if available
@@ -88,11 +100,11 @@ namespace MarsRoverMvc.Services
                                 {
                                     var roverResult = new RoverResultData
                                     {
-                                        RoverId = result.GetProperty("roverId").GetInt32(),
-                                        FinalX = result.GetProperty("finalX").GetInt32(),
-                                        FinalY = result.GetProperty("finalY").GetInt32(),
-                                        FinalDirection = result.GetProperty("finalDirection").GetString() ?? "N",
-                                        Commands = result.GetProperty("commands").GetString() ?? string.Empty,
+                                        RoverId = GetJsonInt(result, "roverId"),
+                                        FinalX = GetJsonInt(result, "finalX"),
+                                        FinalY = GetJsonInt(result, "finalY"),
+                                        FinalDirection = GetJsonString(result, "finalDirection", "N"),
+                                        Commands = GetJsonString(result, "commands"),
                                     };
 
                                     // Parse path if available
@@ -100,7 +112,13 @@ namespace MarsRoverMvc.Services
                                     {
                                         foreach (var pathPoint in pathElement.EnumerateArray())
                                         {
-                                            roverResult.Path.Add(pathPoint.GetString() ?? string.Empty);
+                                            var pathStr = pathPoint.ValueKind == JsonValueKind.String 
+                                                ? pathPoint.GetString() 
+                                                : pathPoint.GetRawText();
+                                            if (!string.IsNullOrEmpty(pathStr))
+                                            {
+                                                roverResult.Path.Add(pathStr);
+                                            }
                                         }
                                     }
 
@@ -109,10 +127,11 @@ namespace MarsRoverMvc.Services
                             }
 
                             items.Add(item);
+                            _logger.LogInformation($"Successfully parsed history item: {item.SimulationId}");
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning($"Error parsing history item: {ex.Message}");
+                            _logger.LogWarning($"Error parsing history item: {ex.Message}\n{element.GetRawText()}");
                             continue;
                         }
                     }
@@ -130,6 +149,45 @@ namespace MarsRoverMvc.Services
                 _logger.LogError($"Error calling history API: {ex.Message}");
                 return new List<SimulationHistoryItem>();
             }
+        }
+
+        // Helper methods for safe JSON property extraction
+        private string GetJsonString(JsonElement element, string propertyName, string defaultValue = "")
+        {
+            if (element.TryGetProperty(propertyName, out var property))
+            {
+                return property.GetString() ?? defaultValue;
+            }
+            return defaultValue;
+        }
+
+        private int GetJsonInt(JsonElement element, string propertyName, int defaultValue = 0)
+        {
+            if (element.TryGetProperty(propertyName, out var property))
+            {
+                try
+                {
+                    return property.GetInt32();
+                }
+                catch
+                {
+                    return defaultValue;
+                }
+            }
+            return defaultValue;
+        }
+
+        private DateTime GetJsonDateTime(JsonElement element, string propertyName)
+        {
+            if (element.TryGetProperty(propertyName, out var property))
+            {
+                var dateStr = property.GetString();
+                if (DateTime.TryParse(dateStr, out var result))
+                {
+                    return result;
+                }
+            }
+            return DateTime.UtcNow;
         }
 
         /// Calls the Web API endpoint to save a screenshot
