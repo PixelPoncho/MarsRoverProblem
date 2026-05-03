@@ -40,17 +40,21 @@ namespace MarsRoverWebApi.Data
                 if (File.Exists(_historyFilePath))
                 {
                     var json = await File.ReadAllTextAsync(_historyFilePath);
+
                     // Parse JSON array
-                    using var document = JsonDocument.Parse(json);
-                    if (document.RootElement.ValueKind == JsonValueKind.Array)
+
+                    using (var document = JsonDocument.Parse(json))
                     {
-                        foreach (var element in document.RootElement.EnumerateArray())
-                        {
-                            // Deserialize each element as a proper object to avoid string/object mismatch
-                            var simulationObj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
-                            if (simulationObj != null)
+                        if (document.RootElement.ValueKind == JsonValueKind.Array)
+                        {                           
+                            foreach (var element in document.RootElement.EnumerateArray())
                             {
-                                simulations.Add(simulationObj);
+                                // Deserialize each element as a proper object to avoid string/object mismatch
+                                var simulationObj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
+                                if (simulationObj != null)
+                                {
+                                    simulations.Add(simulationObj);
+                                }
                             }
                         }
                     }
@@ -91,16 +95,17 @@ namespace MarsRoverWebApi.Data
                     return simulations;
                 }
 
-                using var document = JsonDocument.Parse(json);
-
-                // Convert JSON elements to objects
-                if (document.RootElement.ValueKind == JsonValueKind.Array)
+                using (var document = JsonDocument.Parse(json))
                 {
-                    foreach (var element in document.RootElement.EnumerateArray())
-                    {
-                        // Return as JsonElement wrapped in an object that preserves structure
-                        // The client will deserialize this properly
-                        simulations.Add(element);
+                    // Convert JSON elements to objects
+                    if (document.RootElement.ValueKind == JsonValueKind.Array)
+                    {                       
+                        foreach (var element in document.RootElement.EnumerateArray())
+                        {
+                            // Return as JsonElement wrapped in an object that preserves structure
+                            // The client will deserialize this properly
+                            simulations.Add(element.Clone());
+                        }
                     }
                 }
 
