@@ -27,15 +27,7 @@ builder.Services.AddSingleton<IRoverSimulationService, RoverSimulationService>()
 
 // Add API documentation with Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "Mars Rover API",
-        Version = "v1",
-        Description = "RESTful API for NASA Mars Rover Simulation"
-    });
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
