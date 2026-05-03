@@ -9,9 +9,7 @@
   <!-- NuGet packages required for the Web API -->
   <ItemGroup>
     <!-- ASP.NET Core dependencies (included with SDK) -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-<!--     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" /> -->
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
 </Project>
