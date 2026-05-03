@@ -21,13 +21,6 @@ namespace MarsRoverMvc.Controllers
             return View();
         }
 
-        /// GET /Home/About
-        /// Displays information about the application
-        public IActionResult About()
-        {
-            return View();
-        }
-
         /// Handles errors
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

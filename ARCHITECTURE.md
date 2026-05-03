@@ -34,7 +34,6 @@ MarsRoverProblem/
 │       │   │   └── _Layout.cshtml   # Master layout with sidebar
 │       │   ├── Home/
 │       │   │   ├── Index.cshtml     # Dashboard
-│       │   │   └── About.cshtml     # About page
 │       │   ├── Simulation/
 │       │   │   ├── Index.cshtml     # Simulation form
 │       │   │   └── Result.cshtml    # Results with plateau visualization

@@ -80,31 +80,31 @@ namespace MarsRoverMvc.Services
                                 var item = new SimulationHistoryItem
                                 {
                                     // Get string values immediately while JsonDocument is still alive
-                                    SimulationId = element.GetProperty("simulationId").GetString() ?? string.Empty,
-                                    PlateauSize = element.GetProperty("plateauSize").GetString() ?? string.Empty,
-                                    RoverCount = element.GetProperty("roverCount").GetInt32(),
+                                    SimulationId = element.GetProperty("SimulationId").GetString() ?? string.Empty,
+                                    PlateauSize = element.GetProperty("PlateauSize").GetString() ?? string.Empty,
+                                    RoverCount = element.GetProperty("RoverCount").GetInt32(),
                                     // Parse the date string immediately
-                                    ExecutedAt = DateTime.Parse(element.GetProperty("executedAt").GetString() ?? DateTime.UtcNow.ToString()),
+                                    ExecutedAt = DateTime.Parse(element.GetProperty("ExecutedAt").GetString() ?? DateTime.UtcNow.ToString()),
                                 };
 
                                 // Parse rover results if available
                                 // Again, we extract ALL data while the document is still available
-                                if (element.TryGetProperty("results", out var resultsElement))
+                                if (element.TryGetProperty("Results", out var resultsElement))
                                 {
                                     foreach (var result in resultsElement.EnumerateArray())
                                     {
                                         var roverResult = new RoverResultData
                                         {
-                                            RoverId = result.GetProperty("roverId").GetInt32(),
-                                            FinalX = result.GetProperty("finalX").GetInt32(),
-                                            FinalY = result.GetProperty("finalY").GetInt32(),
+                                            RoverId = result.GetProperty("RoverId").GetInt32(),
+                                            FinalX = result.GetProperty("FinalX").GetInt32(),
+                                            FinalY = result.GetProperty("FinalY").GetInt32(),
                                             // Get string values immediately
-                                            FinalDirection = result.GetProperty("finalDirection").GetString() ?? "N",
-                                            Commands = result.GetProperty("commands").GetString() ?? string.Empty,
+                                            FinalDirection = result.GetProperty("FinalDirection").GetString() ?? "N",
+                                            Commands = result.GetProperty("Commands").GetString() ?? string.Empty,
                                         };
 
                                         // Parse path if available - extract all strings immediately
-                                        if (result.TryGetProperty("path", out var pathElement))
+                                        if (result.TryGetProperty("Path", out var pathElement))
                                         {
                                             foreach (var pathPoint in pathElement.EnumerateArray())
                                             {
