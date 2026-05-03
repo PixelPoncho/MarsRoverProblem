@@ -25,7 +25,7 @@ dotnet run
 You should see:
 ```
 info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: https://localhost:5001
+      Now listening on: https://localhost:5001 or http://localhost:5002
 ```
 
 **Terminal 2 - Start MVC App:**
@@ -36,11 +36,11 @@ dotnet run
 You should see:
 ```
 info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: https://localhost:5000
+      Now listening on: https://localhost:5036 or http://localhost:5035
 ```
 
 ### 4. Open in Browser
-Navigate to: `https://localhost:5000`
+Navigate to: `https://localhost:5036`
 
 ## Using the Application
 
@@ -108,14 +108,14 @@ Rover 2: 5 1 E
 ```
 MarsRoverProblem/
 ├── src/
-│   ├── MarsRoverWebApi/          ← Web Service (Port 5001)
+│   ├── MarsRoverWebApi/          ← Web Service (Port 5001/5002)
 │   │   ├── Controllers/           ← API endpoints
 │   │   ├── Models/                ← Domain models
 │   │   ├── Services/              ← Business logic
 │   │   ├── Data/                  ← Persistence
 │   │   └── Program.cs             ← Configuration
 │   │
-│   └── MarsRoverMvc/              ← MVC App (Port 5000)
+│   └── MarsRoverMvc/              ← MVC App (Port 5035/5036)
 │       ├── Controllers/           ← Page controllers
 │       ├── Views/                 ← HTML/Razor templates
 │       ├── Models/                ← View models
@@ -158,8 +158,8 @@ Edit `appsettings.json` in each project:
 ```json
 "Kestrel": {
   "Endpoints": {
-    "Http": { "Url": "http://localhost:5000" },
-    "Https": { "Url": "https://localhost:5001" }
+    "Http": { "Url": "http://localhost:5035" },
+    "Https": { "Url": "https://localhost:5036" }
   }
 }
 ```
@@ -180,8 +180,8 @@ background: linear-gradient(135deg, #4CAF50, #45a049);
 
 ### "Connection refused" error
 - Ensure both services are running
-- Check ports 5000 and 5001 are not in use
-- Try: `netstat -tuln | grep -E '5000|5001'`
+- Check ports 5035 and 5036 are not in use
+- Try: `netstat -tuln | grep -E '5035|5036'`
 
 ### "CORS error" in browser console
 - Verify API service is running

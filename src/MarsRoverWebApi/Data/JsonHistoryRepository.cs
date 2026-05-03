@@ -46,7 +46,12 @@ namespace MarsRoverWebApi.Data
                     {
                         foreach (var element in document.RootElement.EnumerateArray())
                         {
-                            simulations.Add(element.GetRawText());
+                            // Deserialize each element as a proper object to avoid string/object mismatch
+                            var simulationObj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
+                            if (simulationObj != null)
+                            {
+                                simulations.Add(simulationObj);
+                            }
                         }
                     }
                 }
@@ -79,6 +84,13 @@ namespace MarsRoverWebApi.Data
                 }
 
                 var json = await File.ReadAllTextAsync(_historyFilePath);
+
+                // Handle empty file
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    return simulations;
+                }
+
                 using var document = JsonDocument.Parse(json);
 
                 // Convert JSON elements to objects
@@ -86,8 +98,9 @@ namespace MarsRoverWebApi.Data
                 {
                     foreach (var element in document.RootElement.EnumerateArray())
                     {
-                        // Store as raw JSON string for flexibility
-                        simulations.Add(element.GetRawText());
+                        // Return as JsonElement wrapped in an object that preserves structure
+                        // The client will deserialize this properly
+                        simulations.Add(element);
                     }
                 }
 
@@ -96,6 +109,7 @@ namespace MarsRoverWebApi.Data
             catch (Exception ex)
             {
                 Console.WriteLine($"Error retrieving simulations from history: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return new List<object>();
             }
         }

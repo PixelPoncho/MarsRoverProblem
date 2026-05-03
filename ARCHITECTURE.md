@@ -5,7 +5,7 @@
 ```
 MarsRoverProblem/
 ├── src/
-│   ├── MarsRoverWebApi/              # RESTful Web Service (Port 5001)
+│   ├── MarsRoverWebApi/              # RESTful Web Service (Port 5001/5002)
 │   │   ├── Controllers/
 │   │   │   └── RoverController.cs    # API endpoints for simulation
 │   │   ├── Models/
@@ -24,7 +24,7 @@ MarsRoverProblem/
 │   │   ├── appsettings.json
 │   │   └── appsettings.Development.json
 │   │
-│   └── MarsRoverMvc/                 # ASP.NET Core MVC App (Port 5000)
+│   └── MarsRoverMvc/                 # ASP.NET Core MVC App (Port 5035/5036)
 │       ├── Controllers/
 │       │   ├── HomeController.cs    # Home page navigation
 │       │   ├── SimulationController.cs # Simulation form & results

@@ -3,10 +3,8 @@ namespace MarsRoverMvc.Services
     using MarsRoverMvc.Models;
     using System.Text.Json;
 
-    /// <summary>
     /// Implementation of the Rover API Service
     /// Makes HTTP calls to the Web API backend
-    /// </summary>
     public class RoverApiService : IRoverApiService
     {
         private readonly HttpClient _httpClient;
@@ -18,10 +16,8 @@ namespace MarsRoverMvc.Services
             _logger = logger;
         }
 
-        /// <summary>
         /// Calls the Web API endpoint to simulate rovers
         /// POST /api/rover/simulate
-        /// </summary>
         public async Task<SimulationResponse?> SimulateAsync(SimulationRequest request)
         {
             try
@@ -54,11 +50,9 @@ namespace MarsRoverMvc.Services
             }
         }
 
-        /// <summary>
         /// Calls the Web API endpoint to get simulation history
         /// GET /api/rover/history
         /// IMPORTANT: We parse the JSON immediately and convert to objects to avoid JsonDocument disposal issues
-        /// </summary>
         public async Task<List<SimulationHistoryItem>> GetHistoryAsync()
         {
             try
@@ -149,10 +143,8 @@ namespace MarsRoverMvc.Services
             }
         }
 
-        /// <summary>
         /// Calls the Web API endpoint to save a screenshot
         /// POST /api/rover/save-screenshot
-        /// </summary>
         public async Task<bool> SaveScreenshotAsync(string simulationId, string screenshotBase64)
         {
             try
