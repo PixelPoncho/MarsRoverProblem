@@ -1,4 +1,4 @@
-@model SimulationResultViewModel
+@model MarsRoverMvc.Models.SimulationResultViewModel
 
 @{
     ViewData["Title"] = "Simulation Results";
@@ -70,11 +70,22 @@
 
 <script>
     // Data passed to the visualization script
+    // IMPORTANT: Using proper JSON serialization with camelCase property names
+    // This ensures JavaScript can access properties with standard naming convention
     const plateauData = {
         maxX: @Model.PlateauMaxX,
         maxY: @Model.PlateauMaxY,
-        rovers: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Results))
+        rovers: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Results,
+            new System.Text.Json.JsonSerializerOptions 
+            { 
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            }
+        ))
     };
+
+    // Debug: Log the data to verify it's being parsed correctly
+    console.log('Plateau Data:', plateauData);
 
     // Draw the plateau when the page loads
     window.addEventListener('load', function() {
@@ -138,13 +149,19 @@
         }
         
         // Draw rovers and their paths
+        // Colors for different rovers
         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'];
         
         plateauData.rovers.forEach((rover, index) => {
             const color = colors[index % colors.length];
             
+            console.log(`Processing rover ${index}:`, rover);
+            
             // Draw path
+            // IMPORTANT: Check for 'path' property (now in camelCase)
             if (rover.path && rover.path.length > 0) {
+                console.log(`Drawing path for rover ${index} with ${rover.path.length} points`);
+                
                 ctx.strokeStyle = color;
                 ctx.globalAlpha = 0.5;
                 ctx.lineWidth = 2;
@@ -167,9 +184,11 @@
                 
                 ctx.stroke();
                 ctx.globalAlpha = 1;
+            } else {
+                console.warn(`No path data for rover ${index}`);
             }
             
-            // Draw start position (green)
+            // Draw start position (green S)
             if (rover.path && rover.path.length > 0) {
                 const startCoords = rover.path[0].split(' ');
                 const startX = parseInt(startCoords[0]);
@@ -178,11 +197,13 @@
                 const xPos = padding + (startX * cellWidth) + (cellWidth / 2);
                 const yPos = canvas.height - padding - (startY * cellHeight) - (cellHeight / 2);
                 
+                // Draw green circle for start
                 ctx.fillStyle = '#4CAF50';
                 ctx.beginPath();
                 ctx.arc(xPos, yPos, 8, 0, Math.PI * 2);
                 ctx.fill();
                 
+                // Draw 'S' text
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 12px Arial';
                 ctx.textAlign = 'center';
@@ -190,7 +211,7 @@
                 ctx.fillText('S', xPos, yPos);
             }
             
-            // Draw final position (red)
+            // Draw final position (colored circle with rover number)
             const finalXPos = padding + (rover.finalX * cellWidth) + (cellWidth / 2);
             const finalYPos = canvas.height - padding - (rover.finalY * cellHeight) - (cellHeight / 2);
             
@@ -199,6 +220,7 @@
             ctx.arc(finalXPos, finalYPos, 10, 0, Math.PI * 2);
             ctx.fill();
             
+            // Draw rover number in circle
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
