@@ -5,62 +5,107 @@
 }
 
 
-<!-- Plateau Visualization -->
-<section class="card">
+<div class="simulation-grid">
 
-    <h1 class="page-title">✓ Simulation Complete</h1>
-    <p class="page-description">Plateau: @Model.PlateauMaxX x @Model.PlateauMaxY | Rovers: @Model.Results.Count | Executed: @Model.ExecutedAt.ToString("yyyy-MM-dd HH:mm:ss")</p>
+    <!-- Plateau Visualization -->
+    <section class="card">
+        <div class="card-header">
+            <h1>Plateau Visualization</h1>
+        </div>
 
-    <div id="plateauContainer" style="display: flex; justify-content: center; margin: 30px 0;">
-        <canvas id="plateauCanvas" width="500" height="500" style="border: 2px solid #ddd; background: #f0f0f0; border-radius: 8px;"></canvas>
+        <div class="card-body">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="form-group">
+                    <label class="form-label" for="PlateauMaxX">Plateau Width (Max X)</label>
+                    <input type="number" id="PlateauMaxX" name="PlateauMaxX" value="@Model.PlateauMaxX"
+                           min="1" max="50" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="PlateauMaxY">Plateau Height (Max Y)</label>
+                    <input type="number" id="PlateauMaxY" name="PlateauMaxY" value="@Model.PlateauMaxY"
+                           min="1" max="50" class="form-input" required>
+                </div>
+            </div>
+
+            <div id="plateauContainer" style="display: flex; justify-content: center; margin: 30px 0;">
+                <canvas id="plateauCanvas" width="500" height="500" style="border: 2px solid #ddd; background: #f0f0f0; border-radius: 8px;"></canvas>
+            </div>
+
+            <input type="hidden" id="simulationId" value="@Model.SimulationId">
+        </div>
+    </section>
+
+    <div>
+        <section class="card">
+            <div class="card-header">
+                <h3>Legend</h3>
+            </div>
+
+            <div class="card-body">
+                legend
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h3>Results</h3>
+            </div>
+
+            <div class="card-body">
+                results
+            </div>
+        </section>
+
     </div>
+</div>
 
-    <button type="button" class="btn btn-secondary" onclick="captureScreenshot('plateauContainer')">
-        📷 Capture Screenshot
-    </button>
-    <input type="hidden" id="simulationId" value="@Model.SimulationId">
-</section>
 
 <!-- Results Table -->
 <section class="card">
-    <h2 class="card-title">4. Results</h2>
+    <div class="card-header">
+        <h3>Rover(s) Output</h3>
+    </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Rover</th>
-            <th>Final Position (X Y D)</th>
-            <th>Commands</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var result in Model.Results)
-        {
+    <div class="card-body">
+
+        <table>
+            <thead>
             <tr>
-                <td>
-                    <strong>Rover @result.RoverId</strong>
-                </td>
-                <td>
-                    <strong>@result.FinalX @result.FinalY @result.FinalDirection</strong>
-                </td>
-                <td>
-                    <code>@result.Commands</code>
-                </td>
+                <th>#</th>
+                <th>Final Position (X Y D)</th>
+                <th>Commands</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var result in Model.Results)
+            {
+                <tr>
+                    <td>
+                        <strong>Rover @result.RoverId</strong>
+                    </td>
+                    <td>
+                        <strong>@result.FinalX @result.FinalY @result.FinalDirection</strong>
+                    </td>
+                    <td>
+                        <code>@result.Commands</code>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
 
-    <!-- Actions -->
-    <div style="display: flex; gap: 10px; margin-top: 30px;">
-        <a href="/Simulation/Index" class="btn btn-primary">
-            <span>⚙️</span>
-            <span>Run Another Simulation</span>
-        </a>
-        <a href="/History/Index" class="btn btn-secondary">
-            <span>📚</span>
-            <span>View History</span>
-        </a>
+        <!-- Actions -->
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+            <a href="/Simulation/Index" class="btn btn-primary">
+                <span>⚙️</span>
+                <span>Run Another Simulation</span>
+            </a>
+            <a href="/History/Index" class="btn btn-secondary">
+                <span>📚</span>
+                <span>View History</span>
+            </a>
+        </div>
     </div>
 </section>
 
@@ -218,26 +263,5 @@
             ctx.textBaseline = 'middle';
             ctx.fillText((index + 1), finalXPos, finalYPos);
         });
-
-        // Draw legend
-        const legendX = canvas.width - 140;
-        const legendY = 20;
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillRect(legendX - 10, legendY - 10, 140, 80);
-        ctx.strokeStyle = '#ddd';
-        ctx.strokeRect(legendX - 10, legendY - 10, 140, 80);
-
-        ctx.fillStyle = '#4CAF50';
-        ctx.font = 'bold 11px Arial';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText('● Start Position', legendX, legendY);
-
-        ctx.fillStyle = '#FF6B6B';
-        ctx.fillText('● Final Position', legendX, legendY + 20);
-
-        ctx.fillStyle = '#ddd';
-        ctx.fillText('--- Path Taken', legendX, legendY + 40);
     }
 </script>

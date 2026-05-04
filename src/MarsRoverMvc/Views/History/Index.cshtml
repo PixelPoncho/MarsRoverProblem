@@ -4,28 +4,25 @@
     ViewData["Title"] = "Simulation History";
 }
 
-@if (Model.Simulations == null || Model.Simulations.Count == 0)
-{
-    <div class="card">
-        <div style="text-align: center; padding: 40px;">
-            <p style="font-size: 16px; color: #666; margin-bottom: 20px;">No simulations yet. Let's create one!</p>
-            <a href="/Simulation/Index" class="btn btn-primary">
-                <span>⚙️</span>
-                <span>Start New Simulation</span>
-            </a>
-        </div>
+
+<section class="card history-page">
+    <div class="card-header">
+        <h1>Recent Simulations</h1>
     </div>
-}
-else
-{
-    <section class="card history-page">
-        <div class="card-header">
-            <h1>Recent Simulations</h1>
-        </div>
 
-        <div class="card-body">
-
-
+    <div class="card-body">
+        @if (Model.Simulations == null || Model.Simulations.Count == 0)
+        {
+            <div style="text-align: center; padding: 40px;">
+                <p style="font-size: 16px; color: #666; margin-bottom: 20px;">No simulations yet. Let's create one!</p>
+                <a href="/Simulation/Index" class="btn btn-primary">
+                    <span>⚙️</span>
+                    <span>Start New Simulation</span>
+                </a>
+            </div>
+        }
+        else
+        {
             <table class="history-table">
                 <thead>
                 <tr>
@@ -76,9 +73,9 @@ else
                 }
                 </tbody>
             </table>
-        </div>
-    </section>
-}
+        }
+    </div>
+</section>
 
 <script>
     function viewDetails(simulationId) {

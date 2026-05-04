@@ -182,7 +182,7 @@ nav.sidebar-container.collapsed header.logo .logo-icon {
 /* Main Content */
 .page-container {
   flex: 1;
-  padding: 40px;
+  padding: 20px 40px;
 }
 
 /* ////////////////////////////////////////////////////// */
@@ -344,6 +344,13 @@ section.card table.history-table {
   grid-template-columns: 1fr 1fr;
 }
 
+.simulation-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* main | sidebar */
+  gap: 24px;
+  align-items: start;
+}
+
 /* Responsive */
 @@media (max-width: 768px) {
   .container {
@@ -386,3 +393,27 @@ section.card table.history-table {
 }
 
 /* ////////////////////////////////////////////////////// */
+
+/* Header and Body Text */
+p.body-text {
+  margin: 0 0 16px;
+}
+
+div.implementation-text h3 {
+  margin: 0 0 8px;
+}
+
+div.implementation-text ul {
+  margin-left: 20px;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* Flex Layout */
+.flex {
+  display: flex;
+  flex-flow: wrap;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 40px;
+}
