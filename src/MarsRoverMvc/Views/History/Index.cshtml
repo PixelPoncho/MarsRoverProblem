@@ -18,57 +18,67 @@
 }
 else
 {
-    <div class="card">
-        <h2 class="card-title">Recent Simulations</h2>
+    <section class="card history-page">
+        <div class="card-header">
+            <h1>Recent Simulations</h1>
+        </div>
 
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Plateau Size</th>
-                <th>Rovers</th>
-                <th>Results</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var simulation in Model.Simulations)
-            {
+        <div class="card-body">
+
+
+            <table class="history-table">
+                <thead>
                 <tr>
-                    <td>
-                        <code style="font-size: 11px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">
-                            @simulation.SimulationId.Substring(0, 8)...
-                        </code>
-                    </td>
-                    <td>@simulation.PlateauSize</td>
-                    <td>@simulation.RoverCount</td>
-                    <td>
-                        @foreach (var result in simulation.Results)
-                        {
-                            <div style="font-size: 12px; margin-bottom: 4px;">
-                                <strong>Rover @result.RoverId:</strong> @result.FinalX @result.FinalY @result.FinalDirection
-                            </div>
-                        }
-                    </td>
-                    <td>
-                        <small>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</small>
-                    </td>
-                    <td>
-                        <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">
-                            View
-                        </button>
-                    </td>
+                    <th>ID</th>
+                    <th>Plateau Size</th>
+                    <th>Instructions</th>
+                    <th>Results</th>
+                    <th>Date</th>
+                    <th>Actions</th>
                 </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-}
+                </thead>
 
-<div style="text-align: center; margin-top: 30px;">
-    <a href="/" class="btn btn-secondary">← Back to Home</a>
-</div>
+                <tbody>
+                @foreach (var simulation in Model.Simulations)
+                {
+                    <tr>
+                        <td>
+                            <code style="font-size: 11px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">
+                                @simulation.SimulationId.Substring(0, 8)...
+                            </code>
+                        </td>
+                        <td>@simulation.PlateauSize</td>
+                        <td>
+                            @foreach (var result in simulation.Results)
+                            {
+                                <div style="font-size: 12px; margin-bottom: 4px;">
+                                    <strong>Rover @result.RoverId:</strong> @result.Commands
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @foreach (var result in simulation.Results)
+                            {
+                                <div style="font-size: 12px; margin-bottom: 4px;">
+                                    <strong>Rover @result.RoverId:</strong> @result.FinalX @result.FinalY @result.FinalDirection
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <small>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
 
 <script>
     function viewDetails(simulationId) {

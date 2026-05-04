@@ -4,14 +4,12 @@
     ViewData["Title"] = "Simulation Results";
 }
 
-<div class="page-header">
-    <h1 class="page-title">✓ Simulation Complete</h1>
-    <p class="page-description">Plateau: @Model.PlateauMaxX x @Model.PlateauMaxY | Rovers: @Model.Results.Count | Executed: @Model.ExecutedAt.ToString("yyyy-MM-dd HH:mm:ss")</p>
-</div>
 
 <!-- Plateau Visualization -->
 <section class="card">
-    <h2 class="card-title">3. Plateau Visualization</h2>
+
+    <h1 class="page-title">✓ Simulation Complete</h1>
+    <p class="page-description">Plateau: @Model.PlateauMaxX x @Model.PlateauMaxY | Rovers: @Model.Results.Count | Executed: @Model.ExecutedAt.ToString("yyyy-MM-dd HH:mm:ss")</p>
 
     <div id="plateauContainer" style="display: flex; justify-content: center; margin: 30px 0;">
         <canvas id="plateauCanvas" width="500" height="500" style="border: 2px solid #ddd; background: #f0f0f0; border-radius: 8px;"></canvas>
@@ -33,7 +31,6 @@
             <th>Rover</th>
             <th>Final Position (X Y D)</th>
             <th>Commands</th>
-            <th>Path Length</th>
         </tr>
         </thead>
         <tbody>
@@ -49,28 +46,24 @@
                 <td>
                     <code>@result.Commands</code>
                 </td>
-                <td>@result.Path.Count steps</td>
             </tr>
         }
         </tbody>
     </table>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 10px; margin-top: 30px;">
+        <a href="/Simulation/Index" class="btn btn-primary">
+            <span>⚙️</span>
+            <span>Run Another Simulation</span>
+        </a>
+        <a href="/History/Index" class="btn btn-secondary">
+            <span>📚</span>
+            <span>View History</span>
+        </a>
+    </div>
 </section>
 
-<!-- Actions -->
-<div style="display: flex; gap: 10px; margin-top: 30px;">
-    <a href="/Simulation/Index" class="btn btn-primary">
-        <span>⚙️</span>
-        <span>Run Another Simulation</span>
-    </a>
-    <a href="/History/Index" class="btn btn-secondary">
-        <span>📚</span>
-        <span>View History</span>
-    </a>
-    <a href="/" class="btn btn-secondary">
-        <span>🏠</span>
-        <span>Home</span>
-    </a>
-</div>
 
 <script>
     // Data passed to the visualization script
@@ -87,9 +80,6 @@
                     }
                 ))
     };
-
-    // Debug: Log the data to verify it's being parsed correctly
-    console.log('Plateau Data:', plateauData);
 
     // Draw the plateau when the page loads
     window.addEventListener('load', function () {
@@ -159,12 +149,9 @@
         plateauData.rovers.forEach((rover, index) => {
             const color = colors[index % colors.length];
 
-            console.log(`Processing rover ${index}:`, rover);
-
             // Draw path
             // IMPORTANT: Check for 'path' property (now in camelCase)
             if (rover.path && rover.path.length > 0) {
-                console.log(`Drawing path for rover ${index} with ${rover.path.length} points`);
 
                 ctx.strokeStyle = color;
                 ctx.globalAlpha = 0.5;
