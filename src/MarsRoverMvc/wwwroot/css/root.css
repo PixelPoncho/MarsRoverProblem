@@ -351,6 +351,15 @@ section.card table.history-table {
   align-items: start;
 }
 
+/* Flex Layout */
+.flex {
+  display: flex;
+  flex-flow: wrap;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 40px;
+}
+
 /* Responsive */
 @@media (max-width: 768px) {
   .container {
@@ -409,11 +418,40 @@ div.implementation-text ul {
   font-style: italic;
 }
 
-/* Flex Layout */
-.flex {
+/* ////////////////////////////////////////////////////// */
+
+/* Legend */
+section.card.legend-section {
+  max-width: 300px;
+}
+
+.legend-item {
   display: flex;
-  flex-flow: wrap;
-  flex-direction: row;
-  justify-content: space-evenly;
-  gap: 40px;
+  align-items: center;
+  gap: 20px;
+  margin: 0 0 16px;
+}
+
+.legend-item .legend-label {
+  font-size: larger;
+}
+
+/* Square markers */
+.legend-item .legend-icon {
+  color: var(--white);
+  background-color: hsl(175, 50%, 55%);
+  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Dashed path line */
+.legend-item .legend-line {
+  width: 40px;
+  height: 4px;
+  border-top: dashed hsl(175, 50%, 55%);
 }

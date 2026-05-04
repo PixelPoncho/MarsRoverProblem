@@ -6,7 +6,6 @@
 
 
 <div class="simulation-grid">
-
     <!-- Plateau Visualization -->
     <section class="card">
         <div class="card-header">
@@ -15,7 +14,7 @@
 
         <div class="card-body">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="grid grid-2" style=" gap: 20px; margin-bottom: 30px;">
                 <div class="form-group">
                     <label class="form-label" for="PlateauMaxX">Plateau Width (Max X)</label>
                     <input type="number" id="PlateauMaxX" name="PlateauMaxX" value="@Model.PlateauMaxX"
@@ -28,89 +27,154 @@
                 </div>
             </div>
 
-            <div id="plateauContainer" style="display: flex; justify-content: center; margin: 30px 0;">
-                <canvas id="plateauCanvas" width="500" height="500" style="border: 2px solid #ddd; background: #f0f0f0; border-radius: 8px;"></canvas>
+            <div id="plateauContainer"
+                 style="display: flex; justify-content: center; margin: 30px 0; width: 100%;">
+                <canvas id="plateauCanvas"
+                        style="width: 100%; height: 100%; border: 2px solid #ddd; border-radius: 8px;">
+                </canvas>
             </div>
-
+            <div id="tooltip"
+                 style="position:absolute; background:#333; color:#fff; padding:6px 10px;
+            font-size:12px; border-radius:6px; pointer-events:none;
+            display:none;">
+            </div>
             <input type="hidden" id="simulationId" value="@Model.SimulationId">
         </div>
     </section>
 
     <div>
-        <section class="card">
+        <section class="card legend-section">
             <div class="card-header">
-                <h3>Legend</h3>
+                <h2>Legend</h2>
             </div>
 
             <div class="card-body">
-                legend
+                <div class="legend-item">
+                    <div class="legend-icon start">S1</div>
+                    <p class="legend-label">Start Position</p>
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-icon finish">F1</div>
+                    <p class="legend-label">Final Position</p>
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-line"></div>
+                    <p class="legend-label">Rover Path</p>
+                </div>
             </div>
         </section>
 
         <section class="card">
             <div class="card-header">
-                <h3>Results</h3>
+                <h2>Results</h2>
             </div>
 
             <div class="card-body">
-                results
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Final Position</th>
+                        <th>Commands</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var result in Model.Results)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@result.RoverId</strong>
+                            </td>
+                            <td>
+                                <strong>(@result.FinalX, @result.FinalY) @result.FinalDirection</strong>
+                            </td>
+                            <td>
+                                <strong>@result.Commands</strong>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
             </div>
         </section>
-
     </div>
 </div>
 
 
 <!-- Results Table -->
-<section class="card">
-    <div class="card-header">
-        <h3>Rover(s) Output</h3>
-    </div>
-
-    <div class="card-body">
-
-        <table>
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Final Position (X Y D)</th>
-                <th>Commands</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var result in Model.Results)
-            {
-                <tr>
-                    <td>
-                        <strong>Rover @result.RoverId</strong>
-                    </td>
-                    <td>
-                        <strong>@result.FinalX @result.FinalY @result.FinalDirection</strong>
-                    </td>
-                    <td>
-                        <code>@result.Commands</code>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-
-        <!-- Actions -->
-        <div style="display: flex; gap: 10px; margin-top: 30px;">
-            <a href="/Simulation/Index" class="btn btn-primary">
-                <span>⚙️</span>
-                <span>Run Another Simulation</span>
-            </a>
-            <a href="/History/Index" class="btn btn-secondary">
-                <span>📚</span>
-                <span>View History</span>
-            </a>
+<div class="simulation-grid">
+    <section class="card">
+        <div class="card-header">
+            <h2>Rover(s) Input</h2>
         </div>
-    </div>
-</section>
+
+        <div class="card-body">
+            <!-- Actions -->
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <a href="/Simulation/Index" class="btn btn-primary">
+                    <span>⚙️</span>
+                    <span>Run Another Simulation</span>
+                </a>
+                <a href="/History/Index" class="btn btn-secondary">
+                    <span>📚</span>
+                    <span>View History</span>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
 
 
 <script>
+    let mouse = { x: 0, y: 0 };
+
+    const canvas = document.getElementById('plateauCanvas');
+    const tooltip = document.getElementById('tooltip');
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+
+        updateTooltip(e);
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+    });
+
+    function updateTooltip(e) {
+        const canvas = document.getElementById('plateauCanvas');
+        const tooltip = document.getElementById('tooltip');
+
+        const padding = 40;
+
+        const usableWidth = canvas.width - (padding * 2);
+        const usableHeight = canvas.height - (padding * 2);
+
+        const cellWidth = usableWidth / plateauData.maxX;
+        const cellHeight = usableHeight / plateauData.maxY;
+
+        const gridX = Math.floor((mouse.x - padding) / cellWidth);
+        const gridY = Math.floor((canvas.height - mouse.y - padding) / cellHeight);
+
+
+        if (
+            gridX >= 0 && gridX <= plateauData.maxX &&
+            gridY >= 0 && gridY <= plateauData.maxY
+        ) {
+            tooltip.style.display = 'block';
+            tooltip.style.left = `${e.clientX + window.scrollX + 10}px`;
+            tooltip.style.top = `${e.clientY + window.scrollY + 10}px`;
+            tooltip.innerText = `X: ${gridX}, Y: ${gridY}`;
+        } else {
+            tooltip.style.display = 'none';
+        }
+    }
+
     // Data passed to the visualization script
     // IMPORTANT: Using proper JSON serialization with camelCase property names
     // This ensures JavaScript can access properties with standard naming convention
@@ -131,9 +195,24 @@
         drawPlateau();
     });
 
+    // Redraw the plateau when the window is resized to maintain responsiveness, specifically of that of the tooltips
+    window.addEventListener('resize', () => {
+        drawPlateau();
+    });
+
     function drawPlateau() {
         const canvas = document.getElementById('plateauCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Allows us to dynamically size the canvas based on container dimensions
+        const container = document.getElementById('plateauContainer');
+
+        // Match display size
+        const rect = container.getBoundingClientRect();
+
+        // Set actual drawing resolution
+        canvas.width = rect.width;
+        canvas.height = rect.height;
 
         // Canvas dimensions
         const padding = 40;
@@ -141,6 +220,10 @@
         const usableHeight = canvas.height - (padding * 2);
         const cellWidth = usableWidth / plateauData.maxX;
         const cellHeight = usableHeight / plateauData.maxY;
+
+        // Max dimensions for dynamic label spacing
+        const maxDimension = Math.max(plateauData.maxX, plateauData.maxY);
+        let labelStep = maxDimension > 40 ? 10 : maxDimension > 20 ? 5 : 1;
 
         // Clear canvas
         ctx.fillStyle = '#ffffff';
@@ -174,22 +257,30 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
+
         for (let x = 0; x <= plateauData.maxX; x++) {
+            if (x % labelStep !== 0) continue;
+
             const xPos = padding + (x * cellWidth);
-            ctx.fillText(x, xPos, 20);
+            const yPos = canvas.height - padding + 16; // slightly below grid
+
+            ctx.fillText(x, xPos, yPos);
         }
 
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
 
         for (let y = 0; y <= plateauData.maxY; y++) {
+            if (y % labelStep !== 0) continue;
+
             const yPos = canvas.height - padding - (y * cellHeight);
-            ctx.fillText(y, padding - 10, yPos);
+            ctx.fillText(y, padding - 16, yPos);
         }
 
         // Draw rovers and their paths
         // Colors for different rovers
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'];
+        const colors = generateColors(plateauData.rovers.length);
+        const size = 20;
 
         plateauData.rovers.forEach((rover, index) => {
             const color = colors[index % colors.length];
@@ -199,8 +290,9 @@
             if (rover.path && rover.path.length > 0) {
 
                 ctx.strokeStyle = color;
-                ctx.globalAlpha = 0.5;
-                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.7;
+                ctx.lineWidth = 8;       // path thickness
+                ctx.setLineDash([8, 6]); // dash pattern (8px line, 6px gap)               
                 ctx.beginPath();
 
                 rover.path.forEach((pos, i) => {
@@ -208,8 +300,8 @@
                     const x = parseInt(coords[0]);
                     const y = parseInt(coords[1]);
 
-                    const xPos = padding + (x * cellWidth) + (cellWidth / 2);
-                    const yPos = canvas.height - padding - (y * cellHeight) - (cellHeight / 2);
+                    const xPos = padding + (x * cellWidth);
+                    const yPos = canvas.height - padding - (y * cellHeight);
 
                     if (i === 0) {
                         ctx.moveTo(xPos, yPos);
@@ -224,44 +316,62 @@
                 console.warn(`No path data for rover ${index}`);
             }
 
-            // Draw start position (green S)
+            // Draw start position
             if (rover.path && rover.path.length > 0) {
                 const startCoords = rover.path[0].split(' ');
                 const startX = parseInt(startCoords[0]);
                 const startY = parseInt(startCoords[1]);
 
-                const xPos = padding + (startX * cellWidth) + (cellWidth / 2);
-                const yPos = canvas.height - padding - (startY * cellHeight) - (cellHeight / 2);
+                const xPos = padding + (startX * cellWidth);
+                const yPos = canvas.height - padding - (startY * cellHeight);
 
-                // Draw green circle for start
-                ctx.fillStyle = '#4CAF50';
-                ctx.beginPath();
-                ctx.arc(xPos, yPos, 8, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = color;
+                ctx.fillRect(
+                    xPos - size / 2,
+                    yPos - size / 2,
+                    size,
+                    size
+                );
 
-                // Draw 'S' text
+                // Draw 'S' + rover number centered
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 12px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('S', xPos, yPos);
+                ctx.fillText('S' + (index + 1), xPos, yPos);
             }
 
-            // Draw final position (colored circle with rover number)
-            const finalXPos = padding + (rover.finalX * cellWidth) + (cellWidth / 2);
-            const finalYPos = canvas.height - padding - (rover.finalY * cellHeight) - (cellHeight / 2);
+            // Draw final position
+            const finalXPos = padding + (rover.finalX * cellWidth);
+            const finalYPos = canvas.height - padding - (rover.finalY * cellHeight);
 
+            // Draw rover square (finish)
             ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(finalXPos, finalYPos, 10, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillRect(
+                finalXPos - size / 2,
+                finalYPos - size / 2,
+                size,
+                size
+            );
 
-            // Draw rover number in circle
+            // Draw F + rover number centered
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText((index + 1), finalXPos, finalYPos);
+            ctx.fillText('F' + (index + 1), finalXPos, finalYPos);
         });
+    }
+
+    function generateColors(count) {
+        const colors = [];
+        const baseHue = 175; // blue-ish green
+
+        for (let i = 0; i < count; i++) {
+            const hue = (baseHue + (360 / count) * i) % 360; 
+            colors.push(`hsl(${hue}, 50%, 55%)`);
+        }
+
+        return colors;
     }
 </script>
