@@ -1,5 +1,5 @@
-using MarsRoverWebApi.Services;
 using MarsRoverWebApi.Data;
+using MarsRoverWebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,12 +9,12 @@ builder.Services.AddControllers();
 // Enable CORS to allow the MVC app to call this API
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMvc", corsBuilder =>
-    {
-        corsBuilder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-    });
+  options.AddPolicy("AllowMvc", corsBuilder =>
+  {
+    corsBuilder.AllowAnyOrigin()
+                 .AllowAnyMethod()
+                 .AllowAnyHeader();
+  });
 });
 
 // Register application services
@@ -29,12 +29,12 @@ builder.Services.AddSingleton<IRoverSimulationService, RoverSimulationService>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "Mars Rover API",
-        Version = "v1",
-        Description = "RESTful API for NASA Mars Rover Simulation"
-    });
+  c.SwaggerDoc("v1", new()
+  {
+    Title = "Mars Rover API",
+    Version = "v1",
+    Description = "RESTful API for NASA Mars Rover Simulation"
+  });
 });
 
 var app = builder.Build();
@@ -42,8 +42,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  app.UseSwagger();
+  app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

@@ -219,32 +219,6 @@ Data/
 - Constructor injection for testability
 - Interfaces for loose coupling
 
-## Running the Application
-
-### Prerequisites
-- .NET 10 SDK installed
-- Visual Studio 2022 or VS Code
-- Git
-
-### Start Web API (Terminal 1)
-```bash
-cd src/MarsRoverWebApi
-dotnet run
-# API runs on https://localhost:5001
-```
-
-### Start MVC App (Terminal 2)
-```bash
-cd src/MarsRoverMvc
-dotnet run
-# App runs on https://localhost:5000
-```
-
-### Access in Browser
-```
-https://localhost:5000
-```
-
 ## Test Cases
 
 ### Test Case 1: Basic Movement
@@ -316,13 +290,10 @@ Every file includes:
 
 2. **Advanced Visualization**
    - Real-time animation of rover movement
-   - 3D terrain view
-   - Export as video
 
 3. **Collaboration Features**
    - Share simulations with URLs
    - Comments on simulations
-   - Leaderboard
 
 4. **Unit Tests**
    - Test RoverSimulationService logic
