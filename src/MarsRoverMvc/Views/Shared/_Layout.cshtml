@@ -14,44 +14,53 @@
 <body>
 <div class="container">
     <!-- Sidebar -->
-    <nav class="nav-container">
+    <nav id="sidebar" class="sidebar-container">
         <header class="logo">
             <div class="logo-icon">
                 <img src="~/images/icons/rover-icon.svg" alt="Icon" width="50" height="50"/>
             </div>
             <div class="logo-text">
-                <h3 class="logo-title">MARS ROVER SIMULATOR</h3>
+                <h3 class="logo-title">MARS ROVER</h3>
             </div>
         </header>
 
         <hr class="divider"/>
 
-        <ul>
-            <li class="nav-item @(path.Contains("/home") ? "active" : "")">
-                <a href="/home" class="nav-link">
-                    <span class="nav-icon">
-                        <img src="~/images/icons/about-icon.svg" alt="Icon" width="24" height="24"/>
-                    </span>
-                    <p>About</p>
-                </a>
-            </li>
+        <div class="sidebar-content">
+            <ul>
+                <li class="nav-item @(path.Contains("/home") ? "active" : "")">
+                    <a href="/home" class="nav-link">
+                        <span class="nav-icon">
+                            <img src="~/images/icons/about-icon.svg" alt="Icon" width="24" height="24"/>
+                        </span>
+                        <p>About</p>
+                    </a>
+                </li>
 
-            <li class="nav-item @(path.Contains("/simulation") ? "active" : "")">
-                <a href="/Simulation/Index" class="nav-link">
-                    <img class="nav-icon" src="~/images/icons/simulation-icon.svg" alt="Icon" width="24" height="24"/>
-                    <p>Simulations</p>
-                </a>
-            </li>
+                <li class="nav-item @(path.Contains("/simulation") ? "active" : "")">
+                    <a href="/Simulation/Index" class="nav-link">
+                        <img class="nav-icon" src="~/images/icons/simulation-icon.svg" alt="Icon" width="24" height="24"/>
+                        <p>Simulations</p>
+                    </a>
+                </li>
 
-            <li class="nav-item @(path.Contains("/history") ? "active" : "")">
-                <a href="/History/Index" class="nav-link">
-                    <span class="nav-icon">
-                        <img src="~/images/icons/history-icon.svg" alt="Icon" width="24" height="24"/>
-                    </span>
-                    <p>History</p>
-                </a>
-            </li>
-        </ul>
+                <li class="nav-item @(path.Contains("/history") ? "active" : "")">
+                    <a href="/History/Index" class="nav-link">
+                        <span class="nav-icon">
+                            <img src="~/images/icons/history-icon.svg" alt="Icon" width="24" height="24"/>
+                        </span>
+                        <p>History</p>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-toggle">
+                <button id="sidebarToggle">
+                    <img src="~/images/icons/collapse-icon.svg" class="icon-collapse" alt="Collapse" width="30" height="30"/>
+                    <img src="~/images/icons/expand-icon.svg" class="icon-expand" alt="Expand" width="30" height="30"/>
+                </button>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -62,3 +71,23 @@
 </body>
 
 </html>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+
+        // Optional: persist state
+        localStorage.setItem(
+            'sidebarCollapsed',
+            sidebar.classList.contains('collapsed')
+        );
+    });
+
+    // Restore state on load
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+</script>
