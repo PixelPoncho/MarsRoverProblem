@@ -22,7 +22,7 @@ namespace MarsRoverMvc.Services
     Task<bool> SaveScreenshotAsync(string simulationId, string screenshotBase64);
   }
 
-  /// DTO for simulation request sent to the API
+  /// Data Transfer Object (DTO) for simulation request sent to the API
   public class SimulationRequest
   {
     public int PlateauMaxX { get; set; }

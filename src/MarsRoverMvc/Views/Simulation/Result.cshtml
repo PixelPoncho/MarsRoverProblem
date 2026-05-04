@@ -38,6 +38,7 @@
             font-size:12px; border-radius:6px; pointer-events:none;
             display:none;">
             </div>
+
             <input type="hidden" id="simulationId" value="@Model.SimulationId">
         </div>
     </section>
@@ -80,18 +81,19 @@
                         <th>Commands</th>
                     </tr>
                     </thead>
+
                     <tbody>
                     @foreach (var result in Model.Results)
                     {
                         <tr>
                             <td>
-                                <strong>@result.RoverId</strong>
+                                @result.RoverId
                             </td>
                             <td>
-                                <strong>(@result.FinalX, @result.FinalY) @result.FinalDirection</strong>
+                                (@result.FinalX, @result.FinalY) @result.FinalDirection
                             </td>
                             <td>
-                                <strong>@result.Commands</strong>
+                                @result.Commands
                             </td>
                         </tr>
                     }
@@ -128,6 +130,7 @@
 
 
 <script>
+    // The following is to track the mouse position for tooltips and interactivity on the plateau visualization
     let mouse = { x: 0, y: 0 };
 
     const canvas = document.getElementById('plateauCanvas');
@@ -190,15 +193,23 @@
                 ))
     };
 
+    ///////////////////////////////////
+
+
+    /// Event Listeners
     // Draw the plateau when the page loads
+    // Save screenshot of the plateau visualization once loads
     window.addEventListener('load', function () {
         drawPlateau();
+        captureScreenshot();
     });
 
     // Redraw the plateau when the window is resized to maintain responsiveness, specifically of that of the tooltips
     window.addEventListener('resize', () => {
         drawPlateau();
     });
+
+    ///////////////////////////////////
 
     function drawPlateau() {
         const canvas = document.getElementById('plateauCanvas');
@@ -368,10 +379,56 @@
         const baseHue = 175; // blue-ish green
 
         for (let i = 0; i < count; i++) {
-            const hue = (baseHue + (360 / count) * i) % 360; 
+            const hue = (baseHue + (360 / count) * i) % 360;
             colors.push(`hsl(${hue}, 50%, 55%)`);
         }
 
         return colors;
+    }
+</script>
+
+<script>
+    function captureScreenshot() {
+        const element = document.getElementById("plateauCanvas");
+        if (!element) {
+            alert('Element not found');
+            return;
+        }
+
+        html2canvas(element, { backgroundColor: '#ffffff' }).then(canvas => {
+            const base64Image = canvas.toDataURL('image/png');
+            saveScreenshot(base64Image);
+        }).catch(err => {
+            alert('Error capturing screenshot: ' + err);
+        });
+    }
+
+    function saveScreenshot(base64Image) {
+        const simulationId = document.getElementById('simulationId')?.value;
+        if (!simulationId) {
+            alert('Simulation ID not found');
+            return;
+        }
+
+        fetch(`https://localhost:5002/api/rover/save-screenshot?simulationId=${simulationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ imageBase64: base64Image })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Screenshot saved successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving screenshot');
+            });
     }
 </script>

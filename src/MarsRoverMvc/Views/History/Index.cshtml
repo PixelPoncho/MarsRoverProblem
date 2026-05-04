@@ -1,3 +1,11 @@
+@*  
+TODO:  
+ * Automatically save the screenshot after each simulation and display it in the history list once user clicks "View"
+ * Add the ability to delete history entries
+ * Introduce "Pagination" -- Temporarily added dummy pagination buttons in the view, but will need backend support to function properly 
+ * Mobile view
+*@
+
 @model MarsRoverMvc.Models.HistoryViewModel
 
 @{
@@ -7,22 +15,33 @@
 
 <section class="card history-page">
     <div class="card-header">
-        <h1>Recent Simulations</h1>
+        <h1>Simulation History</h1>
     </div>
 
     <div class="card-body">
         @if (Model.Simulations == null || Model.Simulations.Count == 0)
         {
-            <div style="text-align: center; padding: 40px;">
-                <p style="font-size: 16px; color: #666; margin-bottom: 20px;">No simulations yet. Let's create one!</p>
-                <a href="/Simulation/Index" class="btn btn-primary">
-                    <span>⚙️</span>
-                    <span>Start New Simulation</span>
-                </a>
+            <div class="flex">
+                <div class="border-container">
+                    <h3>No History Found</h3>
+                    <p>Run a simulation to create a new history entry.</p>
+                    <a href="/Simulation/Index" class="btn btn-primary" role="button">
+                        <p>Start New Simulation</p>
+                    </a>
+                </div>
             </div>
         }
         else
         {
+            <div class="pagination">
+                <p class="pagination-btn disabled">‹</p>
+                <p class="pagination-btn active">1</p>
+                <p class="pagination-btn">2</p>
+                <p >...</p>
+                <p class="pagination-btn disabled">4</p>
+                <p class="pagination-btn disabled">›</p >
+            </div>
+
             <table class="history-table">
                 <thead>
                 <tr>
@@ -40,29 +59,45 @@
                 {
                     <tr>
                         <td>
-                            <code style="font-size: 11px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">
-                                @simulation.SimulationId.Substring(0, 8)...
-                            </code>
+                            <div class="tooltip-wrapper">
+                                <code>
+                                    @simulation.SimulationId.Substring(0, 8)...
+                                </code>
+                                <p class="tooltip-text id-tooltip">
+                                    @simulation.SimulationId
+                                </p>
+                            </div>
                         </td>
                         <td>@simulation.PlateauSize</td>
-                        <td>
-                            @foreach (var result in simulation.Results)
-                            {
-                                <div style="font-size: 12px; margin-bottom: 4px;">
-                                    <strong>Rover @result.RoverId:</strong> @result.Commands
+                        @foreach (var result in simulation.Results)
+                        {
+                            <td>
+                                <div class="tooltip-wrapper">
+                                    <strong>Rover @result.RoverId:</strong>
+                                    @if (@result.Commands.Length > 20)
+                                    {
+                                        <p>
+                                            @result.Commands.Substring(0, 20)...
+                                        </p>
+                                        <p class="tooltip-text">
+                                            @result.Commands
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        @result.Commands
+                                    }
                                 </div>
-                            }
-                        </td>
-                        <td>
-                            @foreach (var result in simulation.Results)
-                            {
-                                <div style="font-size: 12px; margin-bottom: 4px;">
-                                    <strong>Rover @result.RoverId:</strong> @result.FinalX @result.FinalY @result.FinalDirection
+                            </td>
+
+                            <td>
+                                <div >
+                                    <strong>Rover @result.RoverId:</strong> (@result.FinalX, @result.FinalY) @result.FinalDirection
                                 </div>
-                            }
-                        </td>
+                            </td>
+                        }
                         <td>
-                            <small>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                            <p>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
                         </td>
                         <td>
                             <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">

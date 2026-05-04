@@ -1,3 +1,11 @@
+@*  
+TODO:  
+ * Update the history section
+ * Mobile view
+        * might involve moving the buttons
+        * definitiely need to introduce wrapping behaviour
+*@
+
 @{
     ViewData["Title"] = "Home";
 }
@@ -17,11 +25,11 @@
             compass points.
         </p>
         <p class="body-text">
-            This simulator was created as an ASP.NET Core MVC application and includes some of the following features:
+            This simulator was created as an ASP.NET Core MVC application and was developed using some of the following principles and technologies:
         </p>
 
         <div class="flex">
-            <div class="implementation-text">
+            <div class="border-container">
                 <h3>Web API (ASP.NET Core)</h3>
                 <ul>
                     <li>RESTful endpoints for simulation</li>
@@ -31,13 +39,23 @@
                 </ul>
             </div>
 
-            <div class="implementation-text">
+            <div class="border-container">
                 <h3>MVC Application</h3>
                 <ul>
                     <li>User-friendly UI</li>
                     <li>Plateau visualization</li>
                     <li>Path tracking and display</li>
                     <li>History browsing</li>
+                </ul>
+            </div>
+
+            <div class="border-container">
+                <h3>Technologies Used</h3>
+                <ul>
+                    <li>C#</li>
+                    <li>ASP.NET Core 10</li>
+                    <li>HTML5 & CSS3</li>
+                    <li>JaliScript (Canvas API) </li>
                 </ul>
             </div>
         </div>
@@ -49,26 +67,37 @@
     <section class="card new-simulation-section">
         <div class="card-header">
             <h2>Start New Simulation</h2>
+            <a href="/Simulation/Index" class="btn btn-primary" role="button">
+                <p>Run Simulation</p>
+            </a>
         </div>
 
         <div class="card-body">
-            <p style="color: #666; margin-bottom: 20px;">
-                Configure a plateau, add rovers, and watch them navigate the Martian terrain.
+            <p class="body-text">
+                Configure a plateau, add rovers and define their starting point and commands, and watch how they navigated the Martian terrain.
             </p>
 
-            <div>
-                <h3 style="color: #4CAF50; margin-bottom: 15px;">Rover Commands</h3>
-                <ul style="margin-left: 20px; line-height: 1.8;">
-                    <li><strong>L</strong> - Rotate left 90°</li>
-                    <li><strong>R</strong> - Rotate right 90°</li>
-                    <li><strong>M</strong> - Move forward one grid point</li>
-                </ul>
-            </div>
+            <p class="body-text">
+                Take note of the possible commands and restrictions for the simulation listed below before you begin.
+            </p>
 
-            <a href="/Simulation/Index" class="btn btn-primary">
-                <span>▶</span>
-                <span>Begin Simulation</span>
-            </a>
+            <div class="flex">
+                <div class="border-container">
+                    <h3>Rover Commands</h3>
+                    <ul >
+                        <li><strong>L</strong>: Rotate left 90°</li>
+                        <li><strong>R</strong>: Rotate right 90°</li>
+                        <li><strong>M</strong>: Move forward one grid point</li>
+                    </ul>
+                </div>
+
+                <div class="border-container">
+                    <h3>Plateau Restrictions</h3>
+                    <ul >
+                        <li><strong>Maximum Dimension</strong>: 50 grid points</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -76,16 +105,16 @@
     <section class="card history-section">
         <div class="card-header">
             <h2>View History</h2>
+            <a href="/History/Index" class="btn btn-primary" role="button">
+                <p>View History</p>
+            </a>
         </div>
 
         <div class="card-body">
             <p style="color: #666; margin-bottom: 20px;">
                 Review all past simulations and their results on an interactive plateau.
             </p>
-            <a href="/History/Index" class="btn btn-primary">
-                <span>📚</span>
-                <span>View History</span>
-            </a>
+
         </div>
     </section>
 </div>
