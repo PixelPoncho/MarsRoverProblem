@@ -2,6 +2,7 @@
 :root {
   --main-bg-color: #fafbff;
   --sidenav-color: #1f263e;
+  --sidenav-hover-color: rgba(255, 255, 255, 0.08);
 
   --font-color: #1f263e;
   --subtitle-font-color: #858585;
@@ -112,7 +113,7 @@ nav.sidebar-container .icon-collapse:hover,
 /* HOVER & ACTIVE ITEM*/
 nav.sidebar-container .nav-link:hover,
 nav.sidebar-container .nav-item.active .nav-link {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--sidenav-hover-color);
   opacity: 1;
 }
 
@@ -283,12 +284,19 @@ textarea:focus {
 }
 
 .btn-secondary {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--code-grey);
+  color: var(--tooltip-black);
 }
 
 .btn-secondary:hover {
   background: #e0e0e0;
+}
+
+.btn-secondary:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .btn-danger {
@@ -300,9 +308,49 @@ textarea:focus {
   background: #ff5252;
 }
 
+.btn-danger:disabled {
+  background: #f5a5a5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .btn-small {
   padding: 8px 12px;
   font-size: 12px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.scroll-top-btn {
+  background-color: var(--sidenav-color);
+  color: white;
+
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+
+  width: 45px;
+  height: 45px;
+
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+  display: none; /* hidden initially */
+
+  box-shadow: var(--box-shadow);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.scroll-top-btn:hover {
+  background-color: #31374D;
+  transform: translateY(-2px);
 }
 
 /* ////////////////////////////////////////////////////// */
@@ -387,24 +435,6 @@ section.card table.history-table {
   .grid-2 {
     grid-template-columns: 1fr;
   }
-}
-
-.simulation-page {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 25px;
-}
-
-.main-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.side-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
 }
 
 /* ////////////////////////////////////////////////////// */
@@ -504,15 +534,21 @@ section.card.history-page .flex .border-container a p {
 /* ////////////////////////////////////////////////////// */
 
 /* Pagination */
-.pagination {
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 16px;
+}
+
+.pagination-container .pagination {
   display: flex;
   gap: 8px;
   align-items: center;
   justify-content: end;
-  margin: 0 0 16px;
 }
 
-.pagination-btn {
+.pagination-container .pagination .pagination-btn {
   min-width: 35px;
   height: 35px;
   display: flex;
@@ -527,22 +563,38 @@ section.card.history-page .flex .border-container a p {
   transition: all 0.15s ease;
 }
 
-.pagination-btn:hover {
+.pagination-container .pagination .pagination-btn:hover {
   background-color: #f2f2f2;
   border-color: var(--card-border-color);
 }
 
-.pagination-btn.active {
+.pagination-container .pagination .pagination-btn.active {
   color: white;
   background: var(--accent-blue);
   border-color: var(--accent-blue);
   font-weight: bold;
 }
 
-.pagination-btn.disabled {
+.pagination-container .pagination .pagination-btn.disabled {
   opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.pagination-container .results-per-page {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-container .results-per-page > small {
+  width: 115px;
+}
+
+.pagination-container .results-per-page select.form-select {
+  display: flex;
+  align-items: center;
+  max-width: 60px;
+  padding: 4px;
 }
 
 /* ////////////////////////////////////////////////////// */
@@ -559,12 +611,11 @@ code {
 
 .tooltip-wrapper {
   position: relative;
-  display: inline-block;
 }
 
-.id-preview {
+.tooltip-wrapper .id-preview {
   font-size: 11px;
-  background: #f0f0f0;
+  background: var(--code-grey);
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -591,11 +642,36 @@ code {
   overflow-wrap: break-word;
 }
 
-.tooltip-text.id-tooltip {
+.tooltip-text.id-tooltip,
+.tooltip-text.screenshot-view-tooltip {
   white-space: nowrap;
 }
 
 /* Show on hover */
 .tooltip-wrapper:hover .tooltip-text {
   opacity: 1;
+}
+
+/* ////////////////////////////////////////////////////// */
+
+/* Lightbox */
+.lightbox {
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  position: fixed;
+  z-index: 1;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
 }

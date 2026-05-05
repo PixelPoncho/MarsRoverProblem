@@ -1,8 +1,7 @@
 @*  
 TODO:  
- * Display screenshot in the history list once user clicks "View"
- * Add the ability to delete history entries
- * Introduce "Pagination" -- Temporarily added dummy pagination buttons in the view, but will need backend support to function properly 
+ * Introduce Deletion -- Temporarily added dummy delete button (no functionality yet)
+ * Introduce "Pagination" -- Temporarily added dummy pagination buttons (no functionality yet)
  * Mobile view
 *@
 
@@ -35,12 +34,20 @@ TODO:
         {
             <div class="pagination-container">
                 <div class="results-per-page">
-                    <p>Results per page</p>
+                    <small>Results per page</small>
                     <select class="form-select">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="10">
+                            <small>10</small>
+                        </option>
+                        <option value="25">
+                            <small>25</small>
+                        </option>
+                        <option value="50">
+                            <small>50</small>
+                        </option>
+                        <option value="100">
+                            <small>100</small>
+                        </option>
                     </select>
                 </div>
 
@@ -70,6 +77,7 @@ TODO:
                 @foreach (var simulation in Model.Simulations)
                 {
                     <tr>
+                        @* ID *@
                         <td>
                             <div class="tooltip-wrapper">
                                 <code>
@@ -80,10 +88,14 @@ TODO:
                                 </p>
                             </div>
                         </td>
+
+                        @* Plateau Size *@
                         <td>@simulation.PlateauSize</td>
-                        @foreach (var result in simulation.Results)
-                        {
-                            <td>
+
+                        @* Commands *@
+                        <td>
+                            @foreach (var result in simulation.Results)
+                            {
                                 <div class="tooltip-wrapper">
                                     <strong>Rover @result.RoverId:</strong>
                                     @if (@result.Commands.Length > 20)
@@ -100,22 +112,58 @@ TODO:
                                         @result.Commands
                                     }
                                 </div>
-                            </td>
+                            }
+                        </td>
 
-                            <td>
+                        @* Final Coordinates *@
+                        <td>
+                            @foreach (var result in simulation.Results)
+                            {
                                 <div >
                                     <strong>Rover @result.RoverId:</strong> (@result.FinalX, @result.FinalY) @result.FinalDirection
                                 </div>
-                            </td>
-                        }
+                            }
+                        </td>
+
+                        @* Execution Time *@
                         <td>
                             <p>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
                         </td>
+
+                        @* Actions *@
                         <td>
-                            <img src="@simulation.ScreenshotDataUri" alt="Screenshot" class="screenshot-preview"/>
-                            @* <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.ScreenshotDataUri')">
-                                View
-                            </button> *@
+                            <div class="btn-group">
+                                <div class="tooltip-wrapper">
+                                    <button class="btn btn-secondary btn-small"
+                                            onclick="openLightbox('@simulation.ScreenshotDataUri')"
+                                            @(string.IsNullOrEmpty(simulation.ScreenshotDataUri) ? "disabled" : "")>
+                                        View
+                                    </button>
+
+                                    @if (string.IsNullOrEmpty(simulation.ScreenshotDataUri))
+                                    {
+                                        <p class="tooltip-text screenshot-view-tooltip">
+                                            Screenshot Not Available
+                                        </p>
+                                    }
+                                </div>
+
+
+                                <div class="tooltip-wrapper">
+
+                                    <button class="btn btn-danger btn-small" disabled>
+                                        <img src="/images/icons/remove-icon.svg" alt="Remove Icon" width="16" height="16"/>
+                                    </button>
+
+                                    <p class="tooltip-text screenshot-view-tooltip">
+                                        Feature Not Available
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+                                <img id="lightbox-img" src="" alt="Full Screenshot"/>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -125,9 +173,50 @@ TODO:
     </div>
 </section>
 
-<script>
-    function viewDetails(screenshotDataUri) {
+<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()">
+    <img src="/images/icons/up-arrow-icon.svg" alt="Up Icon" width="16" height="16"/>
+</button>
 
-        alert('Simulation ID: ' + simulationId + '\n\nDetailed view coming soon!');
+
+@* Lightbox Behaviour *@
+<script id="lightbox_js">
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const img = document.getElementById('lightbox-img');
+
+        img.src = src;
+        lightbox.style.display = 'flex';
+    }
+</script>
+
+@* Scroll To Top Behaviour *@
+<script>
+    const scrollButton = document.getElementById("scrollTopBtn");
+
+    // Show/hide button on scroll
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+            scrollButton.style.display = "block";
+        } else {
+            scrollButton.style.display = "none";
+        }
+    });
+
+    // Scroll to top
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 </script>
