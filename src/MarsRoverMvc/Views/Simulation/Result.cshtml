@@ -113,6 +113,79 @@
         </div>
 
         <div class="card-body">
+
+            <form method="post" action="/Simulation/Run" id="simulationForm">
+                <input type="hidden" id="HiddenPlateauMaxX" name="PlateauMaxX">
+                <input type="hidden" id="HiddenPlateauMaxY" name="PlateauMaxY">
+
+                <h2 class="card-title" style="margin-top: 40px;">2. Rovers</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Add rovers to the plateau. Each rover needs a starting position and a series of commands.
+                </p>
+
+                <div id="roversContainer">
+                    @if (Model.InputRovers != null && Model.InputRovers.Count > 0)
+                    {
+                        @for (int i = 0; i < Model.InputRovers.Count; i++)
+                        {
+                            <div class="rover-row" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <strong>Rover @(i + 1)</strong>
+                                    @if (i > 0)
+                                    {
+                                        <button type="button" class="btn btn-danger btn-small"
+                                                onclick="removeRover(this)">
+                                            ✕ Remove
+                                        </button>
+                                    }
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Start X</label>
+                                        <input type="number" name="Rovers[@i].StartX" value="@Model.InputRovers[i].StartX"
+                                               min="0" max="50" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Start Y</label>
+                                        <input type="number" name="Rovers[@i].StartY" value="@Model.InputRovers[i].StartY"
+                                               min="0" max="50" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Direction</label>
+                                        <select name="Rovers[@i].StartDirection" class="form-select" required>
+                                            <option value="N" @(Model.InputRovers[i].StartDirection == "N" ? "selected" : "")>North (N)</option>
+                                            <option value="E" @(Model.InputRovers[i].StartDirection == "E" ? "selected" : "")>East (E)</option>
+                                            <option value="S" @(Model.InputRovers[i].StartDirection == "S" ? "selected" : "")>South (S)</option>
+                                            <option value="W" @(Model.InputRovers[i].StartDirection == "W" ? "selected" : "")>West (W)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Commands</label>
+
+                                        <input type="text" name="Rovers[@i].Commands" value="@Model.InputRovers[i].Commands"
+                                               placeholder="e.g., LMLMLMLMM" class="form-input" required
+                                               pattern="[LRM]*" title="Only L, R, M allowed">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addRover()"
+                        style="margin-bottom: 30px;">
+                    + Add Rover
+                </button>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">
+                        <span>▶</span>
+                        <span>Run Simulation</span>
+                    </button>
+                </div>
+            </form>
+
             <!-- Actions -->
             <div style="display: flex; gap: 10px; margin-top: 30px;">
                 <a href="/Simulation/Index" class="btn btn-primary">
@@ -207,6 +280,12 @@
     // Redraw the plateau when the window is resized to maintain responsiveness, specifically of that of the tooltips
     window.addEventListener('resize', () => {
         drawPlateau();
+    });
+
+    document.getElementById('simulationForm').addEventListener('submit', () => {
+        // Before submitting, we need to ensure the hidden inputs for plateau dimensions are updated with the current values
+        document.getElementById('HiddenPlateauMaxX').value = document.getElementById('PlateauMaxX').value;
+        document.getElementById('HiddenPlateauMaxY').value = document.getElementById('PlateauMaxY').value;
     });
 
     ///////////////////////////////////
@@ -422,9 +501,6 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
-            })
-            .then(data => {
-                alert('Screenshot saved successfully!');
             })
             .catch(error => {
                 console.error('Error:', error);

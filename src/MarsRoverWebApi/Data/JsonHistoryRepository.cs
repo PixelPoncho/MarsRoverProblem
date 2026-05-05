@@ -1,5 +1,7 @@
 using MarsRoverWebApi.Services;
 using System.Text.Json;
+using System.Dynamic;
+
 
 namespace MarsRoverWebApi.Data
 {
@@ -78,11 +80,12 @@ namespace MarsRoverWebApi.Data
     }
 
     /// Retrieves all historical simulations from the JSON file
-    public async Task<List<object>> GetAllSimulationsAsync()
+    public async Task<List<Tuple<string, object>>> GetAllSimulationsAsync()
     {
       try
       {
-        var simulations = new List<object>();
+        var simulations = new List<Tuple<string, object>>();
+
 
         if (!File.Exists(_historyFilePath))
         {
@@ -106,7 +109,20 @@ namespace MarsRoverWebApi.Data
             {
               // Return as JsonElement wrapped in an object that preserves structure
               // The client will deserialize this properly
-              simulations.Add(element.Clone());
+
+    
+              var simulationId = element.GetProperty("SimulationId");
+              var screenshotPath = Path.Combine(_screenshotsDirectory, $"{simulationId}.png.base64");
+
+              var screenshotDataUri = string.Empty;
+
+              if (File.Exists(screenshotPath))
+              {
+                screenshotDataUri = await File.ReadAllTextAsync(screenshotPath);
+              }
+
+              // Add screenshot data to the simulation object for client retrieval
+              simulations.Add(Tuple.Create(screenshotDataUri, (object)element.Clone()));
             }
           }
         }
@@ -117,7 +133,7 @@ namespace MarsRoverWebApi.Data
       {
         Console.WriteLine($"Error retrieving simulations from history: {ex.Message}");
         Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-        return new List<object>();
+        return new List<Tuple<string, object>>();
       }
     }
 

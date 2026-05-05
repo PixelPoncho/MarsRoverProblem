@@ -1,6 +1,6 @@
 @*  
 TODO:  
- * Automatically save the screenshot after each simulation and display it in the history list once user clicks "View"
+ * Display screenshot in the history list once user clicks "View"
  * Add the ability to delete history entries
  * Introduce "Pagination" -- Temporarily added dummy pagination buttons in the view, but will need backend support to function properly 
  * Mobile view
@@ -33,13 +33,25 @@ TODO:
         }
         else
         {
-            <div class="pagination">
-                <p class="pagination-btn disabled">‹</p>
-                <p class="pagination-btn active">1</p>
-                <p class="pagination-btn">2</p>
-                <p >...</p>
-                <p class="pagination-btn disabled">4</p>
-                <p class="pagination-btn disabled">›</p >
+            <div class="pagination-container">
+                <div class="results-per-page">
+                    <p>Results per page</p>
+                    <select class="form-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+
+                <div class="pagination">
+                    <p class="pagination-btn disabled">‹</p>
+                    <p class="pagination-btn active">1</p>
+                    <p class="pagination-btn">2</p>
+                    <p >...</p>
+                    <p class="pagination-btn disabled">4</p>
+                    <p class="pagination-btn disabled">›</p >
+                </div>
             </div>
 
             <table class="history-table">
@@ -100,9 +112,10 @@ TODO:
                             <p>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
                         </td>
                         <td>
-                            <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">
+                            <img src="@simulation.ScreenshotDataUri" alt="Screenshot" class="screenshot-preview"/>
+                            @* <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.ScreenshotDataUri')">
                                 View
-                            </button>
+                            </button> *@
                         </td>
                     </tr>
                 }
@@ -113,7 +126,8 @@ TODO:
 </section>
 
 <script>
-    function viewDetails(simulationId) {
+    function viewDetails(screenshotDataUri) {
+
         alert('Simulation ID: ' + simulationId + '\n\nDetailed view coming soon!');
     }
 </script>

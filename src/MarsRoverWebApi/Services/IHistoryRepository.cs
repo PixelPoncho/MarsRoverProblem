@@ -8,7 +8,7 @@ namespace MarsRoverWebApi.Services
     Task SaveSimulationAsync(object simulation);
 
     /// Retrieves all historical simulations
-    Task<List<object>> GetAllSimulationsAsync();
+    Task<List<Tuple<string, object>>> GetAllSimulationsAsync();
 
     /// Saves a screenshot of a simulation
     Task SaveScreenshotAsync(string simulationId, string screenshotBase64);

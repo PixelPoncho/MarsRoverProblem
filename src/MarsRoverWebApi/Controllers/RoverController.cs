@@ -72,7 +72,7 @@ namespace MarsRoverWebApi.Controllers
         var history = await _historyRepository.GetAllSimulationsAsync();
         return Ok(history);
       }
-      catch (Exception ex)
+      catch (Exception ex)      
       {
         Console.WriteLine($"Error retrieving history: {ex.Message}");
         return StatusCode(500, new { error = "Failed to retrieve history" });

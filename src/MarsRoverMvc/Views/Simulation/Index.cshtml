@@ -5,7 +5,7 @@
 }
 
 
-<div class="card">
+<section class="card plateau-section">
     <h2 class="card-title">1. Plateau Size</h2>
 
     <form method="post" action="/Simulation/Run" id="simulationForm">
@@ -66,6 +66,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Commands</label>
+
                                 <input type="text" name="Rovers[@i].Commands" value="@Model.Rovers[i].Commands"
                                        placeholder="e.g., LMLMLMLMM" class="form-input" required
                                        pattern="[LRM]*" title="Only L, R, M allowed">
@@ -89,54 +90,8 @@
             <a href="/" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
-</div>
+</section>
 
-<script>
-    // Global functions for screenshot capture
-    function captureScreenshot(elementId) {
-        const element = document.getElementById(elementId);
-        if (!element) {
-            alert('Element not found');
-            return;
-        }
-
-        html2canvas(element, { backgroundColor: '#ffffff' }).then(canvas => {
-            const base64Image = canvas.toDataURL('image/png');
-            saveScreenshot(base64Image);
-        }).catch(err => {
-            alert('Error capturing screenshot: ' + err);
-        });
-    }
-
-    function saveScreenshot(base64Image) {
-        const simulationId = document.getElementById('simulationId')?.value;
-        if (!simulationId) {
-            alert('Simulation ID not found');
-            return;
-        }
-
-        fetch(`https://localhost:5002/api/rover/save-screenshot?simulationId=${simulationId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ imageBase64: base64Image })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert('Screenshot saved successfully!');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error saving screenshot');
-            });
-    }
-</script>
 <script>
     // !!! FIX THIS
     let roverCount = @(Model?.Rovers?.Count ?? 0);

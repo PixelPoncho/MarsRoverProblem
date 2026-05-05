@@ -25,5 +25,7 @@ namespace MarsRoverMvc.Models
 
     /// Final results for each rover
     public List<RoverResultData> Results { get; set; } = new List<RoverResultData>();
+
+    public string ScreenshotDataUri { get; set; } = string.Empty;
   }
 }

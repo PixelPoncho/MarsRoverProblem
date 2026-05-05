@@ -38,6 +38,7 @@ namespace MarsRoverMvc.Models
 
     /// Plateau dimensions
     public int PlateauMaxX { get; set; }
+
     public int PlateauMaxY { get; set; }
 
     /// Original input rovers data

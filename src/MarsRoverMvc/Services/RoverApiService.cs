@@ -70,10 +70,12 @@ namespace MarsRoverMvc.Services
           using (var document = JsonDocument.Parse(responseContent))
           {
             // Each item in the response is a simulation record
-            foreach (var element in document.RootElement.EnumerateArray())
+            foreach (var historyEntry in document.RootElement.EnumerateArray())
             {
               try
               {
+                var element = historyEntry.GetProperty("item2");
+                var screenshotDataUri = historyEntry.GetProperty("item1").GetString() ?? string.Empty;
                 // Extract properties from each simulation record
                 // IMPORTANT: We call .GetString() immediately to get the actual string value
                 // NOT storing the JsonElement itself which would cause disposal issues
@@ -86,6 +88,7 @@ namespace MarsRoverMvc.Services
                   // Parse the date string immediately
                   ExecutedAt =
                     DateTime.Parse(element.GetProperty("ExecutedAt").GetString() ?? DateTime.UtcNow.ToString()),
+                  ScreenshotDataUri = screenshotDataUri
                 };
 
                 // Parse rover results if available
