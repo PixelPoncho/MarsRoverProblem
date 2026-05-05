@@ -365,7 +365,7 @@ Available in development mode: https://localhost:5002/swagger/index.html
 # Future Enhancements
 
 1. **Database Integration**
-   - Replace JsonHistoryRepository with EF Core (DB integration)
+   - Replace JsonHistoryRepository with proper DB
    - Add search and filtering
    - Add history entry deletion
 
@@ -373,15 +373,11 @@ Available in development mode: https://localhost:5002/swagger/index.html
    - Real-time animation of rover movement
    - Collision detection for rover simulation
 
-3. **Collaboration Features**
-   - Share simulations with URLs
-   - Comments on simulations
-
-4. **Unit Tests**
+3. **Unit Tests**
    - Test RoverSimulationService logic
    - Test boundary conditions
    - Test command parsing
 
-5. **Performance**
+4. **Performance**
    - Caching for frequently accessed simulations
    - Pagination for history
