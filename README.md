@@ -14,6 +14,21 @@ The plateau is divided up into a grid to simplify navigation. An example positio
 Assume that the square directly North from (x, y) is (x, y+1).
 
 ---
+# Table of Contents
+
+- [Overview](#overview)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Running the Application](#running-the-application)
+- [Using the Application](#using-the-application)
+- [How It Works](#how-it-works)
+- [Core Architecture](#core-architecture)
+- [Test Cases](#test-cases)
+- [Customization](#customization)
+- [API Endpoints](#api-endpoints)
+- [Troubleshooting](#troubleshooting)
+- [Future Enhancements](#future-enhancements)
+---
 
 # Overview
 
@@ -93,16 +108,12 @@ MarsRoverProblem/
 <img width="1438" height="854" alt="image" src="https://github.com/user-attachments/assets/060054e4-9109-49fb-af32-bb1214b14768" />
 <img width="1409" height="801" alt="image" src="https://github.com/user-attachments/assets/7319c3b6-b3f9-4ebe-bc31-fe343a78c20a" />
 
----
-
-# ▶️ Running the Application
+# Running the Application
 
 ## Prerequisites
 
 - .NET 10 SDK
 - Visual Studio 2022 or VS Code
-
----
 
 ## Setup
 
@@ -308,22 +319,22 @@ Update input max value in:
 Simulation/Index.cshtml
 ```
 
-## API Endpoints
+# API Endpoints
 
-### Simulation
+## Simulation
 
 - **POST** `/api/rover/simulate`
   - Input: Plateau dimensions and rovers
   - Output: Final positions and paths
   - Also saves to history automatically
 
-### History
+## History
 
 - **GET** `/api/rover/history`
   - Returns all past simulations with results
   - Sorted by date
 
-### Screenshots
+## Screenshots
 
 - **POST** `/api/rover/save-screenshot`
   - Parameters: `simulationId` (query), `imageBase64` (body)
