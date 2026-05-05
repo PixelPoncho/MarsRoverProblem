@@ -17,9 +17,6 @@ namespace MarsRoverMvc.Models
     /// Plateau dimensions (e.g., "5 x 5")
     public string PlateauSize { get; set; } = string.Empty;
 
-    /// Number of rovers in the simulation
-    public int RoverCount { get; set; }
-
     /// When the simulation was executed
     public DateTime ExecutedAt { get; set; }
 

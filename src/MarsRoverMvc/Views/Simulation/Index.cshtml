@@ -5,23 +5,35 @@
 }
 
 
-<div class="simulation-grid">
+<div class="flex-container">
     <!-- Plateau Visualization -->
-    <section class="card">
+    <section class="card visualization">
         <div class="card-header">
             <h1>Plateau Visualization</h1>
         </div>
 
         <div class="card-body">
+            <div>
+                <p class="instruction-text">
+                    Define the dimensions of the plateau.
+                </p>
+                <p>
+                    <small>Please note the canvas will only update on page load, so re-run the simulation to see any changes reflected in the visualization.</small>
+                </p>
+            </div>
 
-            <div class="grid grid-2" style=" gap: 20px; margin-bottom: 30px;">
+            <div class="flex">
                 <div class="form-group">
-                    <label class="form-label" for="PlateauMaxX">Plateau Width (Max X)</label>
+                    <label class="form-label" for="PlateauMaxX">
+                        <bold class="bold">Plateau Width</bold> <small>(Max X: 50)</small>
+                    </label>
                     <input type="number" id="PlateauMaxX" name="PlateauMaxX" value="@Model.PlateauMaxX"
                            min="1" max="50" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="PlateauMaxY">Plateau Height (Max Y)</label>
+                    <label class="form-label" for="PlateauMaxY">
+                        <bold class="bold">Plateau Height</bold> <small>(Max Y: 50)</small>
+                    </label>
                     <input type="number" id="PlateauMaxY" name="PlateauMaxY" value="@Model.PlateauMaxY"
                            min="1" max="50" class="form-input" required>
                 </div>
@@ -44,6 +56,7 @@
     </section>
 
     <div>
+        @* Legend Section *@
         <section class="card legend-section">
             <div class="card-header">
                 <h2>Legend</h2>
@@ -51,23 +64,28 @@
 
             <div class="card-body">
                 <div class="legend-item">
-                    <div class="legend-icon start">S1</div>
-                    <p class="legend-label">Start Position</p>
+                    <div class="legend-icon start">S#</div>
+                    <p class="legend-label">Rover's Start Position</p>
                 </div>
 
                 <div class="legend-item">
-                    <div class="legend-icon finish">F1</div>
-                    <p class="legend-label">Final Position</p>
+                    <div class="legend-icon finish">F#</div>
+                    <p class="legend-label">Rover's Final Position</p>
                 </div>
 
                 <div class="legend-item">
                     <div class="legend-line"></div>
                     <p class="legend-label">Rover Path</p>
                 </div>
+
+                <p>
+                    <small> Please note each Rover should have a different colour and number associated with it</small>
+                </p>
             </div>
         </section>
 
-        <section class="card">
+        @* Results Table *@
+        <section class="card results-section">
             <div class="card-header">
                 <h2>Results</h2>
             </div>
@@ -83,61 +101,75 @@
                     </thead>
 
                     <tbody>
-                    @foreach (var result in Model.Results)
+                    @if (Model.Results == null || Model.Results.Count == 0)
                     {
                         <tr>
-                            <td>
-                                @result.RoverId
-                            </td>
-                            <td>
-                                (@result.FinalX, @result.FinalY) @result.FinalDirection
-                            </td>
-                            <td>
-                                @result.Commands
+                            <td colspan="3" class="no-results">
+                                <p>
+                                    <small>
+                                        No results to display. Please run a simulation.
+                                    </small>
+                                </p>
                             </td>
                         </tr>
                     }
+                    else
+                    {
+                        @foreach (var result in Model.Results)
+                        {
+                            <tr>
+                                <td>
+                                    @result.RoverId
+                                </td>
+                                <td>
+                                    (@result.FinalX, @result.FinalY) @result.FinalDirection
+                                </td>
+                                <td>
+                                    @result.Commands
+                                </td>
+                            </tr>
+                        }
+                    }
                     </tbody>
                 </table>
+
+                <a href="/History/Index" class="btn btn-secondary history-btn">
+                    <p>View History</p>
+                </a>
             </div>
         </section>
     </div>
 </div>
 
 
-<!-- Results Table -->
-<div class="simulation-grid">
-    <section class="card">
+<!-- Rover Table -->
+<div class="rover-section-container">
+    <section class="card rover">
         <div class="card-header">
-            <h2>Rover(s) Input</h2>
+            <h2>Rover(s)</h2>
         </div>
 
         <div class="card-body">
-
             <form method="post" action="/Simulation/Run" id="simulationForm">
-                <input type="hidden" id="HiddenPlateauMaxX" name="PlateauMaxX">
-                <input type="hidden" id="HiddenPlateauMaxY" name="PlateauMaxY">
+                <input type="hidden" id="HiddenPlateauMaxX" name="PlateauMaxX"
+                       min="1" max="50">
+                <input type="hidden" id="HiddenPlateauMaxY" name="PlateauMaxY"
+                       min="1" max="50">
 
-                <p style="color: #666; margin-bottom: 20px;">
-                    Add rovers to the plateau. Each rover needs a starting position and a series of commands.
+                <p class="instruction-text">
+                    Add rovers to the plateau! Each rover will need a starting position, starting orientation, and a series of commands.
+                </p>
+                <p>
+                    <small>Please note that it currently not possible to traverse out of bounds, as a result, such instructions will be disregarded.</small>
                 </p>
 
-                <div id="roversContainer">
+                <div id="rover-entries-section">
                     @if (Model.InputRovers != null && Model.InputRovers.Count > 0)
                     {
                         @for (int i = 0; i < Model.InputRovers.Count; i++)
                         {
-                            <div class="rover-row" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <strong>Rover @(i + 1)</strong>
-                                    @if (i > 0)
-                                    {
-                                        <button type="button" class="btn btn-danger btn-small"
-                                                onclick="removeRover(this)">
-                                            ✕ Remove
-                                        </button>
-                                    }
-                                </div>
+                            <div class="rover-row">
+                                <h4>Rover @(i + 1)</h4>
 
                                 <div class="form-row">
                                     <div class="form-group">
@@ -145,11 +177,13 @@
                                         <input type="number" name="Rovers[@i].StartX" value="@Model.InputRovers[i].StartX"
                                                min="0" max="50" class="form-input" required>
                                     </div>
+
                                     <div class="form-group">
                                         <label class="form-label">Start Y</label>
                                         <input type="number" name="Rovers[@i].StartY" value="@Model.InputRovers[i].StartY"
                                                min="0" max="50" class="form-input" required>
                                     </div>
+
                                     <div class="form-group">
                                         <label class="form-label">Direction</label>
                                         <select name="Rovers[@i].StartDirection" class="form-select" required>
@@ -159,6 +193,7 @@
                                             <option value="W" @(Model.InputRovers[i].StartDirection == "W" ? "selected" : "")>West (W)</option>
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label class="form-label">Commands</label>
 
@@ -172,21 +207,20 @@
                     }
                 </div>
 
-
                 <!-- Actions -->
-                <div style="display: flex; gap: 10px;">
-                    <button type="button" class="btn btn-secondary" onclick="addRover()"
-                            style="margin-bottom: 30px;">
-                        + Add Rover
-                    </button>
+                <div class="action-container">
+                    <div class="add-remove-rover-container">
+                        <button type="button" class="btn btn-secondary" onclick="addRover()">
+                            + Add Rover
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="removeAllRovers()">
+                            Remove All
+                        </button>
+                    </div>
                     <button type="submit" class="btn btn-primary">
                         <span>▶</span>
                         <span>Run Simulation</span>
                     </button>
-                    <a href="/History/Index" class="btn btn-secondary">
-                        <span>📚</span>
-                        <span>View History</span>
-                    </a>
                 </div>
             </form>
 
@@ -196,7 +230,58 @@
 
 
 <script>
-    // The following is to track the mouse position for tooltips and interactivity on the plateau visualization
+    // Data passed to the visualization script
+    const plateauData = {
+        maxX: @Model.PlateauMaxX,
+        maxY: @Model.PlateauMaxY,
+        rovers: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model.Results,
+                    new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                    }
+                ))
+    };
+
+    ///////////////////////////////////
+
+    /// EVENT LISTENERS
+    // Draw the plateau when the page loads
+    // Save screenshot of the plateau visualization once loads
+    window.addEventListener('load', function () {
+        drawPlateau();
+        captureScreenshot();
+    });
+
+    // Redraw the plateau when the window is resized to maintain responsiveness, specifically of that of the tooltips
+    window.addEventListener('resize', () => {
+        drawPlateau();
+    });
+
+    ///////////////////////////////////
+    // @* Minor form logic when user submits *@
+    document.getElementById('simulationForm').addEventListener('submit', (e) => {
+        // Before submitting, adding hidden inputs for plateau dimensions
+        document.getElementById('HiddenPlateauMaxX').value = document.getElementById('PlateauMaxX').value;
+        document.getElementById('HiddenPlateauMaxY').value = document.getElementById('PlateauMaxY').value;
+    });
+
+    function enforceMax(e, max) {
+        const value = Number(e.target.value);
+
+        if (value > max) {
+            e.target.value = max;
+        }
+    }
+
+    document.getElementById('PlateauMaxX')
+        .addEventListener('input', (e) => enforceMax(e, 50));
+
+    document.getElementById('PlateauMaxY')
+        .addEventListener('input', (e) => enforceMax(e, 50));
+
+    ///////////////////////////////////
+    // @* Logic for rendering tooltip on the plateau canvas *@
     let mouse = { x: 0, y: 0 };
 
     const canvas = document.getElementById('plateauCanvas');
@@ -244,45 +329,8 @@
         }
     }
 
-    // Data passed to the visualization script
-    // IMPORTANT: Using proper JSON serialization with camelCase property names
-    // This ensures JavaScript can access properties with standard naming convention
-    const plateauData = {
-        maxX: @Model.PlateauMaxX,
-        maxY: @Model.PlateauMaxY,
-        rovers: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                    Model.Results,
-                    new System.Text.Json.JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-                    }
-                ))
-    };
-
     ///////////////////////////////////
-
-
-    /// Event Listeners
-    // Draw the plateau when the page loads
-    // Save screenshot of the plateau visualization once loads
-    window.addEventListener('load', function () {
-        drawPlateau();
-        captureScreenshot();
-    });
-
-    // Redraw the plateau when the window is resized to maintain responsiveness, specifically of that of the tooltips
-    window.addEventListener('resize', () => {
-        drawPlateau();
-    });
-
-    document.getElementById('simulationForm').addEventListener('submit', (e) => {
-        // Before submitting, we need to ensure the hidden inputs for plateau dimensions are updated with the current values
-        document.getElementById('HiddenPlateauMaxX').value = document.getElementById('PlateauMaxX').value;
-        document.getElementById('HiddenPlateauMaxY').value = document.getElementById('PlateauMaxY').value;
-    });
-
-    ///////////////////////////////////
-
+    //@* Logic for drawing Plateau and relevant rover + it's paths *@
     function drawPlateau() {
         const canvas = document.getElementById('plateauCanvas');
         const ctx = canvas.getContext('2d');
@@ -457,64 +505,110 @@
 
         return colors;
     }
-</script>
 
-<script>
-
-    // !!! FIX THIS
+    ///////////////////////////////////
+    //@* Logic to adding or removing rover entries*@
     let roverCount = @(Model?.InputRovers?.Count ?? 0);
 
     function addRover() {
-        const container = document.getElementById('roversContainer');
+        const container = document.getElementById('rover-entries-section');
         const plateauX = document.getElementById('PlateauMaxX').value;
         const plateauY = document.getElementById('PlateauMaxY').value;
 
         const html = `
-            <div class="rover-row" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <strong>Rover ${roverCount + 1}</strong>
-                    <button type="button" class="btn btn-danger btn-small" onclick="removeRover(this)">
-                        ✕ Remove
-                    </button>
+        <div class="rover-row">
+            <h4>Rover ${roverCount + 1}</h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Start X</label>
+                    <input type="number" name="Rovers[${roverCount}].StartX" value="0" min="0" max="50" class="form-input" required>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Start X</label>
-                        <input type="number" name="Rovers[${roverCount}].StartX" value="0" min="0" max="50" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Start Y</label>
-                        <input type="number" name="Rovers[${roverCount}].StartY" value="0" min="0" max="50" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Direction</label>
-                        <select name="Rovers[${roverCount}].StartDirection" class="form-select" required>
-                            <option value="N">North (N)</option>
-                            <option value="E">East (E)</option>
-                            <option value="S">South (S)</option>
-                            <option value="W">West (W)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Commands</label>
-                        <input type="text" name="Rovers[${roverCount}].Commands" value="" placeholder="e.g., LMLMLMLMM" class="form-input" required pattern="[LRM]*" title="Only L, R, M allowed">
-                    </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Start Y</label>
+                    <input type="number" name="Rovers[${roverCount}].StartY" value="0" min="0" max="50" class="form-input" required>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Direction</label>
+                    <select name="Rovers[${roverCount}].StartDirection" class="form-select" required>
+                        <option value="N">North (N)</option>
+                        <option value="E">East (E)</option>
+                        <option value="S">South (S)</option>
+                        <option value="W">West (W)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Commands</label>
+                    <input type="text" name="Rovers[${roverCount}].Commands" value="" placeholder="e.g., LMLMLMLMM" class="form-input" required pattern="[LRM]*" title="Only L, R, M allowed">
+                </div>
+
+                <button type="button" class="btn btn-danger btn-small" onclick="removeRover(this)">
+                    <img src="/images/icons/remove-icon.svg" alt="Remove Icon" width="20" height="20"/>
+                </button>
             </div>
+        </div>
         `;
 
         container.insertAdjacentHTML('beforeend', html);
         roverCount++;
     }
 
+    function removeAllRovers() {
+        const container = document.getElementById('rover-entries-section');
+
+        if (!container) {
+            console.error('rover-entries-section not found');
+            return;
+        }
+
+        const roverRows = container.querySelectorAll('.rover-row');
+
+        if (roverRows.length <= 1) {
+            return; // nothing to remove
+        }
+
+        // Remove everything except the first rover
+        for (let i = 1; i < roverRows.length; i++) {
+            roverRows[i].remove();
+        }
+
+        // Reset roverCount to match the remaining structure
+        roverCount = 1;
+
+        reindexRovers();
+    }
+
     function removeRover(button) {
         button.closest('.rover-row').remove();
         roverCount -= 1;
+        reindexRovers()
     }
 
-</script>
+    function reindexRovers() {
+        const rows = document.querySelectorAll('#rover-entries-section .rover-row');
 
-<script>
+        rows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input, select');
+
+            inputs.forEach(input => {
+                if (!input.name) return;
+
+                input.name = input.name.replace(/Rovers\[\d+\]/, `Rovers[${index}]`);
+            });
+
+            // Update rover label text (optional)
+            const label = row.querySelector('strong');
+            if (label) {
+                label.textContent = `Rover ${index + 1}`;
+            }
+        });
+    }
+
+    ///////////////////////////////////
+    // @* Logic pertaining to capturing screenshots *@
     function captureScreenshot() {
         const element = document.getElementById("plateauCanvas");
         if (!element) {

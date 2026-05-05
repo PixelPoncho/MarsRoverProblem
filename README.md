@@ -36,7 +36,7 @@ This solution is split into two applications:
 
 ---
 
-# 🏗️ Project Structure
+# Project Structure
 
 ```
 MarsRoverProblem/
@@ -290,7 +290,7 @@ Plateau: 2 2
 Rover 1: 0 0 N → MMM → Expected: 0 2 N (stops at boundary)
 ```
 
-# 🛠️ Customization
+# Customization
 
 ## Change Ports
 
@@ -325,11 +325,11 @@ Simulation/Index.cshtml
   - Parameters: `simulationId` (query), `imageBase64` (body)
   - Stores screenshot file on disk
 
-# 📚 API Docs
+# API Docs
 
 Available in development mode: https://localhost:5002/swagger/index.html
 
-# 🧯 Troubleshooting
+# Troubleshooting
 
 ### API not responding
 

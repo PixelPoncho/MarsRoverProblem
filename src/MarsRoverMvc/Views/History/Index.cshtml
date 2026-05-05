@@ -2,7 +2,6 @@
 TODO:  
  * Introduce Deletion -- Temporarily added dummy delete button (no functionality yet)
  * Introduce "Pagination" -- Temporarily added dummy pagination buttons (no functionality yet)
- * Mobile view
 *@
 
 @model MarsRoverMvc.Models.HistoryViewModel
@@ -35,7 +34,7 @@ TODO:
             <div class="pagination-container">
                 <div class="results-per-page">
                     <small>Results per page</small>
-                    <select class="form-select">
+                    <select class="form-select" aria-label="Results per page selector">
                         <option value="10">
                             <small>10</small>
                         </option>
@@ -55,9 +54,9 @@ TODO:
                     <p class="pagination-btn disabled">‹</p>
                     <p class="pagination-btn active">1</p>
                     <p class="pagination-btn">2</p>
-                    <p >...</p>
+                    <p>...</p>
                     <p class="pagination-btn disabled">4</p>
-                    <p class="pagination-btn disabled">›</p >
+                    <p class="pagination-btn disabled">›</p>
                 </div>
             </div>
 
@@ -119,7 +118,7 @@ TODO:
                         <td>
                             @foreach (var result in simulation.Results)
                             {
-                                <div >
+                                <div class="result-field">
                                     <strong>Rover @result.RoverId:</strong> (@result.FinalX, @result.FinalY) @result.FinalDirection
                                 </div>
                             }
@@ -127,14 +126,14 @@ TODO:
 
                         @* Execution Time *@
                         <td>
-                            <p>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
+                            <p class="execution-time-field">@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
                         </td>
 
                         @* Actions *@
                         <td>
                             <div class="btn-group">
                                 <div class="tooltip-wrapper">
-                                    <button class="btn btn-secondary btn-small"
+                                    <button class="btn btn-secondary btn-small view-screenshot-btn"
                                             onclick="openLightbox('@simulation.ScreenshotDataUri')"
                                             @(string.IsNullOrEmpty(simulation.ScreenshotDataUri) ? "disabled" : "")>
                                         View
@@ -150,7 +149,6 @@ TODO:
 
 
                                 <div class="tooltip-wrapper">
-
                                     <button class="btn btn-danger btn-small" disabled>
                                         <img src="/images/icons/remove-icon.svg" alt="Remove Icon" width="16" height="16"/>
                                     </button>

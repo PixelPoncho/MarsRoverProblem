@@ -1,11 +1,3 @@
-@*  
-TODO:  
- * Update the history section
- * Mobile view
-        * might involve moving the buttons
-        * definitiely need to introduce wrapping behaviour
-*@
-
 @{
     ViewData["Title"] = "Home";
 }
@@ -55,30 +47,26 @@ TODO:
                     <li>C#</li>
                     <li>ASP.NET Core 10</li>
                     <li>HTML5 & CSS3</li>
-                    <li>JaliScript (Canvas API) </li>
+                    <li>JavaScript (Canvas API) </li>
                 </ul>
             </div>
         </div>
     </div>
 </section>
 
-<div class="grid grid-2">
+<div class="flex home-page">
     <!-- New Simulation Card -->
     <section class="card new-simulation-section">
         <div class="card-header">
             <h2>Start New Simulation</h2>
-            <a href="/Simulation/Index" class="btn btn-primary" role="button">
+            <a href="/Simulation/Index" class="btn btn-primary desktop" role="button">
                 <p>Run Simulation</p>
             </a>
         </div>
 
         <div class="card-body">
             <p class="body-text">
-                Configure a plateau, add rovers and define their starting point and commands, and watch how they navigated the Martian terrain.
-            </p>
-
-            <p class="body-text">
-                Take note of the possible commands and restrictions for the simulation listed below before you begin.
+                Configure a plateau, add rovers and define their starting point and commands, and watch how they navigated the Martian terrain. Please take note of the possible commands and restrictions for the simulation listed below before you begin.
             </p>
 
             <div class="flex">
@@ -98,6 +86,10 @@ TODO:
                     </ul>
                 </div>
             </div>
+
+            <a href="/Simulation/Index" class="btn btn-primary mobile" role="button">
+                <p>Run Simulation</p>
+            </a>
         </div>
     </section>
 
@@ -105,16 +97,29 @@ TODO:
     <section class="card history-section">
         <div class="card-header">
             <h2>View History</h2>
-            <a href="/History/Index" class="btn btn-primary" role="button">
+            <a href="/History/Index" class="btn btn-primary desktop" role="button">
                 <p>View History</p>
             </a>
         </div>
 
         <div class="card-body">
-            <p style="color: #666; margin-bottom: 20px;">
-                Review all past simulations and their results on an interactive plateau.
+            <p class="body-text">
+                Review all past simulations and their results on an interactive plateau. You will find the complete list of available data below.
             </p>
 
+            <div class="border-container">
+                <h3>Information Available</h3>
+                <ul >
+                    <li><strong>Rover ID</strong>: Unique identifier for each rover</li>
+                    <li><strong>Plateau Size</strong>: The dimensions of the plateau that was traversed</li>
+                    <li><strong>Instructions</strong>: List of commands executed by the rover</li>
+                    <li><strong>Final Position</strong>: Final position and orientation after executing commands</li>
+                    <li><strong>Date</strong>: Date and time the simulation was executed</li>
+                    <li><strong>Screenshot</strong>: Image of the simulation results</li>
+                </ul>
+            </div>
+
+            <a href="/History/Index" class="btn btn-primary mobile">View History</a>
         </div>
     </section>
 </div>

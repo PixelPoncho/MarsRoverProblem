@@ -5,7 +5,7 @@ namespace MarsRoverMvc.Services
 
   /// Implementation of the Rover API Service
   /// Makes HTTP calls to the Web API backend
-  public class RoverApiService: IRoverApiService
+  public class RoverApiService : IRoverApiService
   {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RoverApiService> _logger;
@@ -84,7 +84,6 @@ namespace MarsRoverMvc.Services
                   // Get string values immediately while JsonDocument is still alive
                   SimulationId = element.GetProperty("SimulationId").GetString() ?? string.Empty,
                   PlateauSize = element.GetProperty("PlateauSize").GetString() ?? string.Empty,
-                  RoverCount = element.GetProperty("RoverCount").GetInt32(),
                   // Parse the date string immediately
                   ExecutedAt =
                     DateTime.Parse(element.GetProperty("ExecutedAt").GetString() ?? DateTime.UtcNow.ToString()),

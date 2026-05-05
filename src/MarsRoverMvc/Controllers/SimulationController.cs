@@ -23,11 +23,11 @@ namespace MarsRoverMvc.Controllers
     public IActionResult Index()
     {
       // Create a new simulation view model with default values
-      var model = new SimulationViewModel
+      var model = new SimulationResultViewModel
       {
         PlateauMaxX = 5,
         PlateauMaxY = 5,
-        Rovers = new List<RoverInputViewModel>
+        InputRovers = new List<RoverInputViewModel>
                 {
                     // Initialize with one empty rover row
                     new RoverInputViewModel { StartX = 0, StartY = 0, StartDirection = "N", Commands = "" }
@@ -75,7 +75,7 @@ namespace MarsRoverMvc.Controllers
           return View("Index", model);
         }
 
-        // Convert the API response to a result view model
+        // Convert the API response to an updated view model
         var resultModel = new SimulationResultViewModel
         {
           SimulationId = response.SimulationId,
@@ -94,7 +94,7 @@ namespace MarsRoverMvc.Controllers
           }).ToList()
         };
 
-        return View("Result", resultModel);
+        return View("Index", resultModel);
       }
       catch (Exception ex)
       {
