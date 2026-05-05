@@ -1,142 +1,160 @@
 using MarsRoverWebApi.Services;
 using System.Text.Json;
+using System.Dynamic;
+
 
 namespace MarsRoverWebApi.Data
 {
-    /// JSON-based implementation of history persistence
-    /// Stores simulation records and screenshots in JSON files
-    /// This is a temporary solution until a database is implemented
-    public class JsonHistoryRepository : IHistoryRepository
+  /// JSON-based implementation of history persistence
+  /// Stores simulation records and screenshots in JSON files
+  /// This is a temporary solution until a database is implemented
+  public class JsonHistoryRepository: IHistoryRepository
+  {
+    // Directory where all history files are stored
+    private readonly string _historyDirectory;
+
+    // File containing all simulation records
+    private readonly string _historyFilePath;
+
+    // Directory where screenshots are stored
+    private readonly string _screenshotsDirectory;
+
+    public JsonHistoryRepository(IWebHostEnvironment environment)
     {
-        // Directory where all history files are stored
-        private readonly string _historyDirectory;
-        // File containing all simulation records
-        private readonly string _historyFilePath;
-        // Directory where screenshots are stored
-        private readonly string _screenshotsDirectory;
+      // Create necessary directories in the application root
+      _historyDirectory = Path.Combine(environment.ContentRootPath, "Data", "History");
+      _screenshotsDirectory = Path.Combine(environment.ContentRootPath, "Data", "Screenshots");
+      _historyFilePath = Path.Combine(_historyDirectory, "simulations.json");
 
-        public JsonHistoryRepository(IWebHostEnvironment environment)
-        {
-            // Create necessary directories in the application root
-            _historyDirectory = Path.Combine(environment.ContentRootPath, "Data", "History");
-            _screenshotsDirectory = Path.Combine(environment.ContentRootPath, "Data", "Screenshots");
-            _historyFilePath = Path.Combine(_historyDirectory, "simulations.json");
-
-            // Ensure directories exist
-            Directory.CreateDirectory(_historyDirectory);
-            Directory.CreateDirectory(_screenshotsDirectory);
-        }
-
-        /// Saves a simulation result to the JSON history file
-        /// If file doesn't exist, creates it with a new array
-        /// If file exists, appends to the existing array
-        public async Task SaveSimulationAsync(object simulation)
-        {
-            try
-            {
-                // Read existing simulations or create new list
-                var simulations = new List<object>();
-
-                if (File.Exists(_historyFilePath))
-                {
-                    var json = await File.ReadAllTextAsync(_historyFilePath);
-
-                    // Parse JSON array
-
-                    using (var document = JsonDocument.Parse(json))
-                    {
-                        if (document.RootElement.ValueKind == JsonValueKind.Array)
-                        {                           
-                            foreach (var element in document.RootElement.EnumerateArray())
-                            {
-                                // Deserialize each element as a proper object to avoid string/object mismatch
-                                var simulationObj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
-                                if (simulationObj != null)
-                                {
-                                    simulations.Add(simulationObj);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Add new simulation
-                simulations.Add(simulation);
-
-                // Write updated list back to file
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                var jsonContent = JsonSerializer.Serialize(simulations, options);
-                await File.WriteAllTextAsync(_historyFilePath, jsonContent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving simulation to history: {ex.Message}");
-                throw;
-            }
-        }
-
-        /// Retrieves all historical simulations from the JSON file
-        public async Task<List<object>> GetAllSimulationsAsync()
-        {
-            try
-            {
-                var simulations = new List<object>();
-
-                if (!File.Exists(_historyFilePath))
-                {
-                    return simulations; // Return empty list if no history file
-                }
-
-                var json = await File.ReadAllTextAsync(_historyFilePath);
-
-                // Handle empty file
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    return simulations;
-                }
-
-                using (var document = JsonDocument.Parse(json))
-                {
-                    // Convert JSON elements to objects
-                    if (document.RootElement.ValueKind == JsonValueKind.Array)
-                    {                       
-                        foreach (var element in document.RootElement.EnumerateArray())
-                        {
-                            // Return as JsonElement wrapped in an object that preserves structure
-                            // The client will deserialize this properly
-                            simulations.Add(element.Clone());
-                        }
-                    }
-                }
-
-                return simulations;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error retrieving simulations from history: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                return new List<object>();
-            }
-        }
-
-        /// Saves a screenshot (as base64) with its associated simulation ID
-        /// Screenshots are stored as separate files for easy management
-        public async Task SaveScreenshotAsync(string simulationId, string screenshotBase64)
-        {
-            try
-            {
-                // Create a filename based on the simulation ID
-                var filename = $"{simulationId}.png.base64";
-                var filepath = Path.Combine(_screenshotsDirectory, filename);
-
-                // Write the base64-encoded image data to file
-                await File.WriteAllTextAsync(filepath, screenshotBase64);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving screenshot: {ex.Message}");
-                throw;
-            }
-        }
+      // Ensure directories exist
+      Directory.CreateDirectory(_historyDirectory);
+      Directory.CreateDirectory(_screenshotsDirectory);
     }
+
+    /// Saves a simulation result to the JSON history file
+    /// If file doesn't exist, creates it with a new array
+    /// If file exists, appends to the existing array
+    public async Task SaveSimulationAsync(object simulation)
+    {
+      try
+      {
+        // Read existing simulations or create new list
+        var simulations = new List<object>();
+
+        if (File.Exists(_historyFilePath))
+        {
+          var json = await File.ReadAllTextAsync(_historyFilePath);
+
+          // Parse JSON array
+
+          using (var document = JsonDocument.Parse(json))
+          {
+            if (document.RootElement.ValueKind == JsonValueKind.Array)
+            {
+              foreach (var element in document.RootElement.EnumerateArray())
+              {
+                // Deserialize each element as a proper object to avoid string/object mismatch
+                var simulationObj = JsonSerializer.Deserialize<Dictionary<string, object>>(element.GetRawText());
+                if (simulationObj != null)
+                {
+                  simulations.Add(simulationObj);
+                }
+              }
+            }
+          }
+        }
+
+        // Add new simulation
+        simulations.Add(simulation);
+
+        // Write updated list back to file
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var jsonContent = JsonSerializer.Serialize(simulations, options);
+        await File.WriteAllTextAsync(_historyFilePath, jsonContent);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error saving simulation to history: {ex.Message}");
+        throw;
+      }
+    }
+
+    /// Retrieves all historical simulations from the JSON file
+    public async Task<List<Tuple<string, object>>> GetAllSimulationsAsync()
+    {
+      try
+      {
+        var simulations = new List<Tuple<string, object>>();
+
+
+        if (!File.Exists(_historyFilePath))
+        {
+          return simulations; // Return empty list if no history file
+        }
+
+        var json = await File.ReadAllTextAsync(_historyFilePath);
+
+        // Handle empty file
+        if (string.IsNullOrWhiteSpace(json))
+        {
+          return simulations;
+        }
+
+        using (var document = JsonDocument.Parse(json))
+        {
+          // Convert JSON elements to objects
+          if (document.RootElement.ValueKind == JsonValueKind.Array)
+          {
+            foreach (var element in document.RootElement.EnumerateArray())
+            {
+              // Return as JsonElement wrapped in an object that preserves structure
+              // The client will deserialize this properly
+
+    
+              var simulationId = element.GetProperty("SimulationId");
+              var screenshotPath = Path.Combine(_screenshotsDirectory, $"{simulationId}.png.base64");
+
+              var screenshotDataUri = string.Empty;
+
+              if (File.Exists(screenshotPath))
+              {
+                screenshotDataUri = await File.ReadAllTextAsync(screenshotPath);
+              }
+
+              // Add screenshot data to the simulation object for client retrieval
+              simulations.Add(Tuple.Create(screenshotDataUri, (object)element.Clone()));
+            }
+          }
+        }
+
+        return simulations;
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error retrieving simulations from history: {ex.Message}");
+        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        return new List<Tuple<string, object>>();
+      }
+    }
+
+    /// Saves a screenshot (as base64) with its associated simulation ID
+    /// Screenshots are stored as separate files for easy management
+    public async Task SaveScreenshotAsync(string simulationId, string screenshotBase64)
+    {
+      try
+      {
+        // Create a filename based on the simulation ID
+        var filename = $"{simulationId}.png.base64";
+        var filepath = Path.Combine(_screenshotsDirectory, filename);
+
+        // Write the base64-encoded image data to file
+        await File.WriteAllTextAsync(filepath, screenshotBase64);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error saving screenshot: {ex.Message}");
+        throw;
+      }
+    }
+  }
 }

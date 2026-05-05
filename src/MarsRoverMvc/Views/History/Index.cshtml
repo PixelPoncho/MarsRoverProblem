@@ -1,82 +1,222 @@
+@*  
+TODO:  
+ * Introduce Deletion -- Temporarily added dummy delete button (no functionality yet)
+ * Introduce "Pagination" -- Temporarily added dummy pagination buttons (no functionality yet)
+ * Mobile view
+*@
+
 @model MarsRoverMvc.Models.HistoryViewModel
 
 @{
     ViewData["Title"] = "Simulation History";
 }
 
-<div class="page-header">
-    <h1 class="page-title">📚 Simulation History</h1>
-    <p class="page-description">Review all your past simulations</p>
-</div>
 
-@if (Model.Simulations == null || Model.Simulations.Count == 0)
-{
-    <div class="card">
-        <div style="text-align: center; padding: 40px;">
-            <p style="font-size: 16px; color: #666; margin-bottom: 20px;">No simulations yet. Let's create one!</p>
-            <a href="/Simulation/Index" class="btn btn-primary">
-                <span>⚙️</span>
-                <span>Start New Simulation</span>
-            </a>
-        </div>
+<section class="card history-page">
+    <div class="card-header">
+        <h1>Simulation History</h1>
     </div>
-}
-else
-{
-    <div class="card">
-        <h2 class="card-title">Recent Simulations</h2>
-        
-        <table>
-            <thead>
+
+    <div class="card-body">
+        @if (Model.Simulations == null || Model.Simulations.Count == 0)
+        {
+            <div class="flex">
+                <div class="border-container">
+                    <h3>No History Found</h3>
+                    <p>Run a simulation to create a new history entry.</p>
+                    <a href="/Simulation/Index" class="btn btn-primary" role="button">
+                        <p>Start New Simulation</p>
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="pagination-container">
+                <div class="results-per-page">
+                    <small>Results per page</small>
+                    <select class="form-select">
+                        <option value="10">
+                            <small>10</small>
+                        </option>
+                        <option value="25">
+                            <small>25</small>
+                        </option>
+                        <option value="50">
+                            <small>50</small>
+                        </option>
+                        <option value="100">
+                            <small>100</small>
+                        </option>
+                    </select>
+                </div>
+
+                <div class="pagination">
+                    <p class="pagination-btn disabled">‹</p>
+                    <p class="pagination-btn active">1</p>
+                    <p class="pagination-btn">2</p>
+                    <p >...</p>
+                    <p class="pagination-btn disabled">4</p>
+                    <p class="pagination-btn disabled">›</p >
+                </div>
+            </div>
+
+            <table class="history-table">
+                <thead>
                 <tr>
                     <th>ID</th>
                     <th>Plateau Size</th>
-                    <th>Rovers</th>
+                    <th>Instructions</th>
                     <th>Results</th>
                     <th>Date</th>
                     <th>Actions</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+
+                <tbody>
                 @foreach (var simulation in Model.Simulations)
                 {
                     <tr>
+                        @* ID *@
                         <td>
-                            <code style="font-size: 11px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">
-                                @simulation.SimulationId.Substring(0, 8)...
-                            </code>
+                            <div class="tooltip-wrapper">
+                                <code>
+                                    @simulation.SimulationId.Substring(0, 8)...
+                                </code>
+                                <p class="tooltip-text id-tooltip">
+                                    @simulation.SimulationId
+                                </p>
+                            </div>
                         </td>
+
+                        @* Plateau Size *@
                         <td>@simulation.PlateauSize</td>
-                        <td>@simulation.RoverCount</td>
+
+                        @* Commands *@
                         <td>
                             @foreach (var result in simulation.Results)
                             {
-                                <div style="font-size: 12px; margin-bottom: 4px;">
-                                    <strong>Rover @result.RoverId:</strong> @result.FinalX @result.FinalY @result.FinalDirection
+                                <div class="tooltip-wrapper">
+                                    <strong>Rover @result.RoverId:</strong>
+                                    @if (@result.Commands.Length > 20)
+                                    {
+                                        <p>
+                                            @result.Commands.Substring(0, 20)...
+                                        </p>
+                                        <p class="tooltip-text">
+                                            @result.Commands
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        @result.Commands
+                                    }
                                 </div>
                             }
                         </td>
+
+                        @* Final Coordinates *@
                         <td>
-                            <small>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                            @foreach (var result in simulation.Results)
+                            {
+                                <div >
+                                    <strong>Rover @result.RoverId:</strong> (@result.FinalX, @result.FinalY) @result.FinalDirection
+                                </div>
+                            }
                         </td>
+
+                        @* Execution Time *@
                         <td>
-                            <button class="btn btn-secondary btn-small" onclick="viewDetails('@simulation.SimulationId')">
-                                View
-                            </button>
+                            <p>@simulation.ExecutedAt.ToString("yyyy-MM-dd HH:mm")</p>
+                        </td>
+
+                        @* Actions *@
+                        <td>
+                            <div class="btn-group">
+                                <div class="tooltip-wrapper">
+                                    <button class="btn btn-secondary btn-small"
+                                            onclick="openLightbox('@simulation.ScreenshotDataUri')"
+                                            @(string.IsNullOrEmpty(simulation.ScreenshotDataUri) ? "disabled" : "")>
+                                        View
+                                    </button>
+
+                                    @if (string.IsNullOrEmpty(simulation.ScreenshotDataUri))
+                                    {
+                                        <p class="tooltip-text screenshot-view-tooltip">
+                                            Screenshot Not Available
+                                        </p>
+                                    }
+                                </div>
+
+
+                                <div class="tooltip-wrapper">
+
+                                    <button class="btn btn-danger btn-small" disabled>
+                                        <img src="/images/icons/remove-icon.svg" alt="Remove Icon" width="16" height="16"/>
+                                    </button>
+
+                                    <p class="tooltip-text screenshot-view-tooltip">
+                                        Feature Not Available
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+                                <img id="lightbox-img" src="" alt="Full Screenshot"/>
+                            </div>
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        }
     </div>
-}
+</section>
 
-<div style="text-align: center; margin-top: 30px;">
-    <a href="/" class="btn btn-secondary">← Back to Home</a>
-</div>
+<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()">
+    <img src="/images/icons/up-arrow-icon.svg" alt="Up Icon" width="16" height="16"/>
+</button>
 
+
+@* Lightbox Behaviour *@
+<script id="lightbox_js">
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const img = document.getElementById('lightbox-img');
+
+        img.src = src;
+        lightbox.style.display = 'flex';
+    }
+</script>
+
+@* Scroll To Top Behaviour *@
 <script>
-    function viewDetails(simulationId) {
-        alert('Simulation ID: ' + simulationId + '\n\nDetailed view coming soon!');
+    const scrollButton = document.getElementById("scrollTopBtn");
+
+    // Show/hide button on scroll
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+            scrollButton.style.display = "block";
+        } else {
+            scrollButton.style.display = "none";
+        }
+    });
+
+    // Scroll to top
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 </script>
