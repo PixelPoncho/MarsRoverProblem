@@ -1,18 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
-  <!-- NuGet packages required for the MVC application -->
-  <!-- Note: HttpClient is built into the framework, no additional packages needed -->
-<!--   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-  </ItemGroup>
- -->
-  <!-- NuGet packages required for the MVC application -->
-  <!-- Note: HttpClient is built into the framework, no additional packages needed -->
-
 </Project>
