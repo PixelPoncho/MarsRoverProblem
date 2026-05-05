@@ -49,8 +49,6 @@ This solution is split into two applications:
   - Communicates with the Web API
   - Screenshot preview and storage
 
----
-
 # Project Structure
 
 ```
@@ -106,7 +104,7 @@ MarsRoverProblem/
 ## Screenshots
 <img width="929" height="749" alt="image" src="https://github.com/user-attachments/assets/c0088082-4d4c-431d-a135-e9dd1b5eeb6d" />
 <img width="1438" height="854" alt="image" src="https://github.com/user-attachments/assets/060054e4-9109-49fb-af32-bb1214b14768" />
-<img width="1409" height="801" alt="image" src="https://github.com/user-attachments/assets/7319c3b6-b3f9-4ebe-bc31-fe343a78c20a" />
+<img width="1403" height="808" alt="image" src="https://github.com/user-attachments/assets/89ce611a-9816-46bd-ad69-b2dfd6a16756" />
 
 # Running the Application
 
