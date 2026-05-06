@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarsRoverMvc.Controllers
 {
-  /// Controller for the home/dashboard page
+  /// Controller for the home page
   /// Provides navigation to main features
   public class HomeController: Controller
   {
@@ -14,7 +14,7 @@ namespace MarsRoverMvc.Controllers
     }
 
     /// GET /Home/Index
-    /// Displays the home/dashboard page with navigation links
+    /// Displays the home page with navigation links
     public IActionResult Index()
     {
       return View();

@@ -1,8 +1,10 @@
+using MarsRoverMvc.Models.Api;
+using MarsRoverMvc.Models.Simulations;
+using MarsRoverMvc.Models.Rovers;
+using System.Text.Json;
+
 namespace MarsRoverMvc.Services
 {
-  using MarsRoverMvc.Models;
-  using System.Text.Json;
-
   /// Implementation of the Rover API Service
   /// Makes HTTP calls to the Web API backend
   public class RoverApiService : IRoverApiService
@@ -53,96 +55,118 @@ namespace MarsRoverMvc.Services
     /// Calls the Web API endpoint to get simulation history
     /// GET /api/rover/history
     /// IMPORTANT: We parse the JSON immediately and convert to objects to avoid JsonDocument disposal issues
-    public async Task<List<SimulationHistoryItem>> GetHistoryAsync()
+    public async Task<List<SimulationSummary>> GetHistoryAsync()
     {
       try
       {
         // Make the GET request to retrieve history
         var response = await _httpClient.GetAsync("/api/rover/history");
 
-        if (response.IsSuccessStatusCode)
-        {
-          var responseContent = await response.Content.ReadAsStringAsync();
-          var items = new List<SimulationHistoryItem>();
-
-          // Use a using statement to ensure the JsonDocument is properly disposed
-          // This is critical - we must extract all data before the document is disposed
-          using (var document = JsonDocument.Parse(responseContent))
-          {
-            // Each item in the response is a simulation record
-            foreach (var historyEntry in document.RootElement.EnumerateArray())
-            {
-              try
-              {
-                var element = historyEntry.GetProperty("item2");
-                var screenshotDataUri = historyEntry.GetProperty("item1").GetString() ?? string.Empty;
-                // Extract properties from each simulation record
-                // IMPORTANT: We call .GetString() immediately to get the actual string value
-                // NOT storing the JsonElement itself which would cause disposal issues
-                var item = new SimulationHistoryItem
-                {
-                  // Get string values immediately while JsonDocument is still alive
-                  SimulationId = element.GetProperty("SimulationId").GetString() ?? string.Empty,
-                  PlateauSize = element.GetProperty("PlateauSize").GetString() ?? string.Empty,
-                  // Parse the date string immediately
-                  ExecutedAt =
-                    DateTime.Parse(element.GetProperty("ExecutedAt").GetString() ?? DateTime.UtcNow.ToString()),
-                  ScreenshotDataUri = screenshotDataUri
-                };
-
-                // Parse rover results if available
-                // Again, we extract ALL data while the document is still available
-                if (element.TryGetProperty("Results", out var resultsElement))
-                {
-                  foreach (var result in resultsElement.EnumerateArray())
-                  {
-                    var roverResult = new RoverResultData
-                    {
-                      RoverId = result.GetProperty("RoverId").GetInt32(),
-                      FinalX = result.GetProperty("FinalX").GetInt32(),
-                      FinalY = result.GetProperty("FinalY").GetInt32(),
-                      // Get string values immediately
-                      FinalDirection = result.GetProperty("FinalDirection").GetString() ?? "N",
-                      Commands = result.GetProperty("Commands").GetString() ?? string.Empty,
-                    };
-
-                    // Parse path if available - extract all strings immediately
-                    if (result.TryGetProperty("Path", out var pathElement))
-                    {
-                      foreach (var pathPoint in pathElement.EnumerateArray())
-                      {
-                        // Get the string value immediately
-                        var pathString = pathPoint.GetString() ?? string.Empty;
-                        roverResult.Path.Add(pathString);
-                      }
-                    }
-
-                    item.Results.Add(roverResult);
-                  }
-                }
-
-                items.Add(item);
-              }
-              catch (Exception ex)
-              {
-                _logger.LogWarning($"Error parsing history item: {ex.Message}");
-                continue;
-              }
-            }
-          } // JsonDocument is disposed here after all data is extracted
-
-          return items;
-        }
-        else
+        if (!response.IsSuccessStatusCode)
         {
           _logger.LogError($"API error: {response.StatusCode}");
-          return new List<SimulationHistoryItem>();
+          return new List<SimulationSummary>();
         }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var items = new List<SimulationSummary>();
+
+        // Use a using statement to ensure the JsonDocument is properly disposed
+        // This is critical - we must extract all data before the document is disposed
+        using (var document = JsonDocument.Parse(responseContent))
+        {
+          // Each item in the response is a simulation record
+          foreach (var historyEntry in document.RootElement.EnumerateArray())
+          {
+            try
+            {
+              var element = historyEntry.GetProperty("item2");
+              var screenshotDataUri = historyEntry.GetProperty("item1").GetString() ?? string.Empty;
+
+              // Extract properties from each simulation record
+              // IMPORTANT: We call .GetString() immediately to get the actual string value
+              // NOT storing the JsonElement itself which would cause disposal issues
+
+              var plateauSize = element.GetProperty("PlateauSize").GetString();
+
+              var plateauDimensions = plateauSize.Split('x', StringSplitOptions.TrimEntries);
+
+
+              var item = new SimulationSummary()
+              {
+                // Get string values immediately while JsonDocument is still alive
+                SimulationId = element.GetProperty("SimulationId").GetString() ?? string.Empty,
+                PlateauMaxX = int.Parse(plateauDimensions[0]),
+                PlateauMaxY = int.Parse(plateauDimensions[1]),
+                // Parse the date string immediately
+                ExecutedAt =
+                  DateTime.Parse(element.GetProperty("ExecutedAt").GetString() ?? DateTime.UtcNow.ToString()),
+                ScreenshotDataUri = screenshotDataUri
+              };
+
+              // Parse rover results if available
+              // Again, we extract ALL data while the document is still available
+              if (element.TryGetProperty("Results", out var resultsElement))
+              {
+                foreach (var result in resultsElement.EnumerateArray())
+                {
+                  var roverResult = new RoverResultData
+                  {
+                    RoverId = result.GetProperty("RoverId").GetInt32(),
+                    FinalX = result.GetProperty("FinalX").GetInt32(),
+                    FinalY = result.GetProperty("FinalY").GetInt32(),
+                    // Get string values immediately
+                    FinalDirection = result.GetProperty("FinalDirection").GetString() ?? "N",
+                    Commands = result.GetProperty("Commands").GetString() ?? string.Empty,
+                  };
+
+                  // Parse path if available - extract all strings immediately
+                  if (result.TryGetProperty("Path", out var pathElement))
+                  {
+                    foreach (var pathPoint in pathElement.EnumerateArray())
+                    {
+                      var pathString = pathPoint.GetString();
+
+                      if (string.IsNullOrWhiteSpace(pathString))
+                        continue;
+
+                      var parts = pathString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                      if (parts.Length != 3)
+                      {
+                        _logger.LogWarning("Invalid path format: {Path}", pathString);
+                        continue;
+                      }
+
+                      roverResult.Path.Add(new RoverPosition
+                      {
+                        X = int.Parse(parts[0]),
+                        Y = int.Parse(parts[1]),
+                        Direction = parts[2]
+                      });
+                    }
+                  }
+
+                  item.Results.Add(roverResult);
+                }
+              }
+
+              items.Add(item);
+            }
+            catch (Exception ex)
+            {
+              _logger.LogWarning($"Error parsing history item: {ex.Message}");
+              continue;
+            }
+          }
+        } // JsonDocument is disposed here after all data is extracted
+
+        return items;
       }
       catch (Exception ex)
       {
         _logger.LogError($"Error calling history API: {ex.Message}");
-        return new List<SimulationHistoryItem>();
+        return new List<SimulationSummary>();
       }
     }
 

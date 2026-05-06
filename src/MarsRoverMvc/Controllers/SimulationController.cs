@@ -1,4 +1,6 @@
-using MarsRoverMvc.Models;
+using MarsRoverMvc.Models.Simulations;
+using MarsRoverMvc.Models.Rovers;
+using MarsRoverMvc.Models.Api;
 using MarsRoverMvc.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +9,7 @@ namespace MarsRoverMvc.Controllers
   /// Controller for the main simulation page
   /// Handles user input for plateau and rover configuration
   /// Communicates with the Web API for simulation execution
-  public class SimulationController: Controller
+  public class SimulationController : Controller
   {
     private readonly IRoverApiService _apiService;
     private readonly ILogger<SimulationController> _logger;
@@ -28,20 +30,26 @@ namespace MarsRoverMvc.Controllers
         PlateauMaxX = 5,
         PlateauMaxY = 5,
         InputRovers = new List<RoverInputViewModel>
-                {
-                    // Initialize with one empty rover row
-                    new RoverInputViewModel { StartX = 0, StartY = 0, StartDirection = "N", Commands = "" }
-                }
+        {
+          // Initialize with one empty rover row
+          new()
+          {
+            StartX = 0,
+            StartY = 0,
+            StartDirection = "N",
+            Commands = ""
+          }
+        }
       };
 
       return View(model);
     }
 
-    /// POST /Simulation/Run
+    /// POST /Simulation/Index
     /// Processes the simulation form submission
     /// Calls the Web API to run the simulation and displays results
     [HttpPost]
-    public async Task<IActionResult> Run(SimulationViewModel model)
+    public async Task<IActionResult> Index(SimulationViewModel model)
     {
       try
       {
@@ -49,7 +57,7 @@ namespace MarsRoverMvc.Controllers
         if (model?.Rovers == null || model.Rovers.Count == 0)
         {
           ModelState.AddModelError("", "At least one rover is required");
-          return View("Index", model);
+          return View(model);
         }
 
         // Create the API request from the view model
@@ -89,19 +97,37 @@ namespace MarsRoverMvc.Controllers
             FinalX = r.FinalX,
             FinalY = r.FinalY,
             FinalDirection = r.FinalDirection,
-            Path = r.Path,
-            Commands = r.Commands
+            Path = RoverPathMapper.Parse(r.Path), Commands = r.Commands
           }).ToList()
         };
 
-        return View("Index", resultModel);
+        return View(resultModel);
       }
       catch (Exception ex)
       {
         _logger.LogError($"Simulation error: {ex.Message}");
         ModelState.AddModelError("", "An unexpected error occurred");
-        return View("Index", model);
+        return View(model);
       }
+    }
+  }
+
+  // Please note placement of this class is temporary. Understanding it should be in a Mapping/ folder or something similar
+  public static class RoverPathMapper
+  {
+    public static List<RoverPosition> Parse(List<string> path)
+    {
+      return path.Select(p =>
+      {
+        var parts = p.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        return new RoverPosition
+        {
+          X = int.TryParse(parts.ElementAtOrDefault(0), out var x) ? x : 0,
+          Y = int.TryParse(parts.ElementAtOrDefault(1), out var y) ? y : 0,
+          Direction = parts.ElementAtOrDefault(2) ?? string.Empty
+        };
+      }).ToList();
     }
   }
 }

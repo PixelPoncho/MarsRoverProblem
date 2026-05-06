@@ -14,6 +14,7 @@ The plateau is divided up into a grid to simplify navigation. An example positio
 Assume that the square directly North from (x, y) is (x, y+1).
 
 ---
+
 # Table of Contents
 
 - [Overview](#overview)
@@ -28,6 +29,7 @@ Assume that the square directly North from (x, y) is (x, y+1).
 - [API Endpoints](#api-endpoints)
 - [Troubleshooting](#troubleshooting)
 - [Future Enhancements](#future-enhancements)
+
 ---
 
 # Overview
@@ -82,15 +84,28 @@ MarsRoverProblem/
 │       │   ├── Shared/
 │       │   │   └── _Layout.cshtml   # Master layout with sidebar
 │       │   ├── Home/
-│       │   │   ├── Index.cshtml     # Dashboard
+│       │   │   └── Index.cshtml     # Dashboard
 │       │   ├── Simulation/
-│       │   │   ├── Index.cshtml     # Simulation form
+│       │   │   └── Index.cshtml     # Simulation form
 │       │   ├── History/
 │       │   │   └── Index.cshtml     # History table
 │       │   └── _ViewStart.cshtml    # View initialization
 │       ├── Models/
-│       │   ├── SimulationViewModel.cs  # Simulation input/output models
-│       │   └── HistoryViewModel.cs     # History display models
+│       │   ├── API/
+│       │   │   ├── RoverInputData.cs       # DTO sent to API representing rover initial state + commands
+│       │   │   ├── RoverOutput.cs          # DTO returned from API for a single rover result
+│       │   │   ├── SimulationRequest.cs    # Full simulation request sent to Web API
+│       │   │   └── SimulationResponse.cs   # Full API response containing simulation results
+│       │   ├── History/
+│       │   │   └── HistoryViewModel.cs   # View model used to render simulation history page
+│       │   ├── Rovers/
+│       │   │   ├── RoverInputViewModel.cs    # UI model for rover input form (MVC side)
+│       │   │   ├── RoverPositionModel.cs     # Represents a single rover position step (x, y, direction)
+│       │   │   └── RoverResultDataModel.cs   # MVC-friendly version of rover result + path + final state
+│       │   └── Simulations/
+│       │   │   ├── SimulationResultViewModel.cs    # Final rendered result view (includes rovers + UI data)
+│       │   │   ├── SimulationSummaryModel.cs       # Summary view model (metadata + results + screenshot)
+│       │   │   └── SimulationViewModel.cs          # Input form model for running a simulation
 │       ├── Services/
 │       │   ├── IRoverApiService.cs  # API communication interface
 │       │   └── RoverApiService.cs   # HTTP client for Web API
@@ -101,7 +116,9 @@ MarsRoverProblem/
 ├── MarsRoverProblem.sln             # Solution file
 └── README.md                         # This file
 ```
+
 ## Screenshots
+
 <img width="929" height="749" alt="image" src="https://github.com/user-attachments/assets/c0088082-4d4c-431d-a135-e9dd1b5eeb6d" />
 <img width="1438" height="854" alt="image" src="https://github.com/user-attachments/assets/060054e4-9109-49fb-af32-bb1214b14768" />
 <img width="1403" height="808" alt="image" src="https://github.com/user-attachments/assets/89ce611a-9816-46bd-ad69-b2dfd6a16756" />
