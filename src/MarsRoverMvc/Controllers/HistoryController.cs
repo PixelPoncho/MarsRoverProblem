@@ -6,7 +6,7 @@ namespace MarsRoverMvc.Controllers
 {
   /// Controller for the simulation history page
   /// Displays all past simulations and their results
-  public class HistoryController: Controller
+  public class HistoryController : Controller
   {
     private readonly IRoverApiService _apiService;
     private readonly ILogger<HistoryController> _logger;
@@ -37,7 +37,7 @@ namespace MarsRoverMvc.Controllers
       }
       catch (Exception ex)
       {
-        _logger.LogError($"Error loading history: {ex.Message}");
+        _logger.LogError(ex, "Error loading history page");
         // Return empty history on error
         return View(new HistoryViewModel());
       }
