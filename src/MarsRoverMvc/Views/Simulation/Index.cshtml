@@ -249,6 +249,7 @@
     // Draw the plateau when the page loads
     // Save screenshot of the plateau visualization once loads
     window.addEventListener('load', function () {
+        removeAllRovers();
         drawPlateau();
         captureScreenshot();
     });
@@ -266,7 +267,15 @@
         document.getElementById('HiddenPlateauMaxY').value = document.getElementById('PlateauMaxY').value;
     });
 
-    function enforceMax(e, max) {
+    ///////////////////////////////////
+    // @* Minor form logic to ensure users dont enter values larger than expected *@
+    document.getElementById('PlateauMaxX')
+        .addEventListener('input', (e) => enforcePlateauMax(e, 50));
+
+    document.getElementById('PlateauMaxY')
+        .addEventListener('input', (e) => enforcePlateauMax(e, 50));
+
+    function enforcePlateauMax(e, max) {
         const value = Number(e.target.value);
 
         if (value > max) {
@@ -275,10 +284,85 @@
     }
 
     document.getElementById('PlateauMaxX')
-        .addEventListener('input', (e) => enforceMax(e, 50));
+        .addEventListener('input', enforceAllRoverBounds);
 
     document.getElementById('PlateauMaxY')
-        .addEventListener('input', (e) => enforceMax(e, 50));
+        .addEventListener('input', enforceAllRoverBounds);
+
+    document.getElementById('rover-entries-section')
+        .addEventListener('input', (e) => {
+            if (e.target.name?.includes('StartX') || e.target.name?.includes('StartY')) {
+                enforceAllRoverBounds();
+            }
+        });
+
+    document.getElementById('rover-entries-section')
+        .addEventListener('blur', (e) => {
+            if (e.target.name?.includes('StartX') || e.target.name?.includes('StartY')) {
+                enforceAllRoverBounds();
+            }
+        }, true);
+
+    function clamp(val, min, max) {
+        if (isNaN(val)) return min;
+        return Math.max(min, Math.min(max, val));
+    }
+
+    function enforceAllRoverBounds() {
+        const maxX = Number(document.getElementById('PlateauMaxX').value);
+        const maxY = Number(document.getElementById('PlateauMaxY').value);
+
+        document.querySelectorAll('.rover-row').forEach(row => {
+            const xInput = row.querySelector('input[name*="StartX"]');
+            const yInput = row.querySelector('input[name*="StartY"]');
+
+            if (xInput) {
+                const val = Number(xInput.value);
+                xInput.value = clamp(val, 0, maxX);
+                xInput.max = maxX;
+            }
+
+            if (yInput) {
+                const val = Number(yInput.value);
+                yInput.value = clamp(val, 0, maxY);
+                yInput.max = maxY;
+            }
+        });
+    }
+
+    // Keep input attributes in sync
+    function syncMinMaxAttributes() {
+        const maxX = Number(plateauX.value);
+        const maxY = Number(plateauY.value);
+
+        document.querySelectorAll('.rover-row').forEach(row => {
+            const x = row.querySelector('input[name*="StartX"]');
+            const y = row.querySelector('input[name*="StartY"]');
+
+            if (x) {
+                x.min = 0;
+                x.max = maxX;
+            }
+
+            if (y) {
+                y.min = 0;
+                y.max = maxY;
+            }
+        });
+    }
+
+    document.getElementById('PlateauMaxX')
+        .addEventListener('input', (e) => enforcePlateauMax(e, 50));
+
+    document.getElementById('PlateauMaxY')
+        .addEventListener('input', (e) => enforcePlateauMax(e, 50));
+
+    document.getElementById('PlateauMaxX')
+        .addEventListener('input', (e) => clampValue(0, plateauX.value));
+
+    document.getElementById('PlateauMaxY')
+        .addEventListener('input', (e) => clampValue(0, plateauY.value));
+
 
     ///////////////////////////////////
     // @* Logic for rendering tooltip on the plateau canvas *@
