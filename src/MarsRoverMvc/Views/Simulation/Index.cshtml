@@ -598,9 +598,9 @@
             });
 
             // Update rover label text (optional)
-            const label = row.querySelector('strong');
-            if (label) {
-                label.textContent = `Rover ${index + 1}`;
+            const title = row.querySelector('h4');
+            if (title) {
+                title.textContent = `Rover ${index + 1}`;
             }
         });
     }
